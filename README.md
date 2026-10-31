@@ -1,6 +1,6 @@
 # Patwa Wave
 Calm, simple site to learn Jamaican Patois. Live: https://patois-learn.pages.dev
-- Change the name: `SITE_NAME` in app.js. Words: data.js. Audio: `python3 gen_audio.py` (edge-tts) then commit `audio/`.
+- Change the name: `SITE_NAME` in app.js. Words: data.js. Audio: `python3 gen_audio.py` (edge-tts) then commit `audio/` and set AUDIO_BASE in app.js to that commit hash.
 
 ## Optional Google sign-in (free, Supabase)
 1. supabase.com → New project (free) named `patwa-wave`. Do NOT use the Ember project.
