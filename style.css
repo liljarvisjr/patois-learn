@@ -26,3 +26,5 @@ footer{color:var(--soft);font-size:.8em;padding:30px 18px}
 body.still *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 #intro{position:fixed;inset:0;z-index:99;cursor:pointer}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#123047;color:#fff;padding:12px 18px;border-radius:12px;max-width:90vw;z-index:50}
+details{margin-top:10px}summary{cursor:pointer;color:var(--accent)}ol{margin:6px 0 0;padding-left:22px}dd.en{font-size:1.1em}
