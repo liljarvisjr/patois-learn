@@ -1,0 +1,10 @@
+-- Patwa Wave: run once in your NEW Supabase project (SQL Editor). Not the Ember project.
+create table if not exists public.progress (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  data jsonb not null default '{}',
+  updated_at timestamptz not null default now()
+);
+alter table public.progress enable row level security;
+create policy "own row read"   on public.progress for select using (auth.uid() = user_id);
+create policy "own row insert" on public.progress for insert with check (auth.uid() = user_id);
+create policy "own row update" on public.progress for update using (auth.uid() = user_id);

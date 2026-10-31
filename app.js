@@ -1,47 +1,110 @@
 const SITE_NAME="Patwa Wave"; // <- change the site name here
+const AUDIO_BASE="https://cdn.jsdelivr.net/gh/liljarvisjr/patois-learn@main/audio/";
 document.title=SITE_NAME+" — Learn Jamaican Patois";document.querySelector("h1").textContent=SITE_NAME;
 const W=[];for(const c in DATA)for(const e of DATA[c])W.push({c,p:e[0],e:e[1],l:e[2],x:e[3],xe:e[4],s:e[5],id:c+"|"+e[0]});
-const S=Object.assign({box:{},favs:[],big:false,dys:false,still:false,voice:true},JSON.parse(localStorage.getItem("patois")||"{}"));
-const save=()=>localStorage.setItem("patois",JSON.stringify(S));
+const byId=Object.fromEntries(W.map(w=>[w.id,w]));
+const DEF={box:{},favs:[],notes:{},miss:{},days:{},done:{},big:false,dys:false,still:false,dark:false,voice:true,updated:0};
+const S=Object.assign({},DEF,JSON.parse(localStorage.getItem("patois")||"{}"));
 const $=q=>document.querySelector(q),app=$("#app");
-const esc=t=>String(t).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
-let VOICE=null;function pickVoice(){const vs=window.speechSynthesis?speechSynthesis.getVoices():[];VOICE=vs.find(v=>/en-JM/i.test(v.lang))||vs.find(v=>/^en[-_]GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null}
-if(window.speechSynthesis){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
-function toast(t){let m=$("#toast");if(!m){m=document.createElement("div");m.id="toast";document.body.appendChild(m)}m.textContent=t;m.hidden=false;clearTimeout(m._t);m._t=setTimeout(()=>m.hidden=true,4000)}
-function say(t){if(!S.voice){toast("Read-aloud is off. Turn it on in Settings.");return}
-if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){toast("Sorry, this browser can't read aloud.");return}
-const ss=speechSynthesis;if(ss.speaking||ss.pending)ss.cancel();if(ss.paused)ss.resume();
-const u=new SpeechSynthesisUtterance(t);u.rate=.85;u.lang=VOICE?VOICE.lang:"en-US";try{if(VOICE)u.voice=VOICE}catch(e){}
-u.onerror=e=>{if(e.error!="interrupted"&&e.error!="canceled")toast("Read-aloud didn't work. Check your phone isn't on silent.")};ss.speak(u)}
-function applyPrefs(){document.body.classList.toggle("big",S.big);document.body.classList.toggle("dys",S.dys);document.body.classList.toggle("still",S.still)}
-function prog(){const k=W.filter(w=>(S.box[w.id]||0)>=3).length;$("#bar").style.width=(k/W.length*100)+"%";$("#progtext").textContent=`${k} of ${W.length} words learned `}
-function card(w,full=true){const f=S.favs.includes(w.id),P=esc(JSON.stringify(w.p)),X=esc(JSON.stringify(w.x));return `<div class="card"><p class="pt">${esc(w.p)}</p><dl><dt>Means:</dt><dd class="en">${esc(w.e)}</dd>${full?`<dt>Say it like:</dt><dd>${esc(w.s)}</dd><dt>Example:</dt><dd><b>${esc(w.x)}</b><br>${esc(w.xe)}</dd>`:""}</dl>${full?`<details><summary>Show more</summary><p>Word by word: ${esc(w.l)}</p></details>`:""}<div class="row"><button onclick="say(${P})">🔊 Hear</button>${full?`<button onclick="say(${X})">🔊 Example</button>`:""}<button onclick="fav('${esc(w.id)}',this)">${f?"★ Saved":"☆ Save"}</button></div></div>`}
-function fav(id,b){const i=S.favs.indexOf(id);i<0?S.favs.push(id):S.favs.splice(i,1);save();b.textContent=i<0?"★ Saved":"☆ Save"}
+const esc=t=>String(t).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const today=()=>new Date().toISOString().slice(0,10);
+function save(){S.updated=Date.now();localStorage.setItem("patois",JSON.stringify(S));clearTimeout(save._t);save._t=setTimeout(()=>window.cloudSave&&cloudSave(),1500)}
+function mark(){S.days[today()]=(S.days[today()]||0)+1}
+function toast(t){let m=$("#toast");if(!m){m=document.createElement("div");m.id="toast";m.setAttribute("role","status");document.body.appendChild(m)}m.textContent=t;m.hidden=false;clearTimeout(m._t);m._t=setTimeout(()=>m.hidden=true,4000)}
+/* ---------- sound: real MP3 first, speech as backup ---------- */
+const player=new Audio();player.preload="none";
+function speak(t){if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){toast("Sorry, sound isn't working on this browser.");return}const ss=speechSynthesis;if(ss.speaking||ss.pending)ss.cancel();if(ss.paused)ss.resume();const u=new SpeechSynthesisUtterance(t);u.rate=.85;u.lang="en-GB";ss.speak(u)}
+function say(t){if(!S.voice){toast("Sound is off. Turn it on in Me → Settings.");return}
+const h=AUDIO[t];if(!h){speak(t);return}
+try{player.pause();player.src=AUDIO_BASE+h+".mp3";const p=player.play();if(p&&p.catch)p.catch(()=>speak(t))}catch(e){speak(t)}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b)say(b.dataset.say)});
+/* ---------- prefs ---------- */
+function applyPrefs(){const c=document.body.classList;c.toggle("big",S.big);c.toggle("dys",S.dys);c.toggle("still",S.still);c.toggle("dark",S.dark);if(S.dys&&!$("#dysf")){const l=document.createElement("link");l.id="dysf";l.rel="stylesheet";l.href="https://fonts.cdnfonts.com/css/opendyslexic";document.head.appendChild(l)}}
+function prog(){const k=W.filter(w=>(S.box[w.id]||0)>=3).length;$("#bar").style.width=(k/W.length*100)+"%";$("#progtext").textContent=`${k} of ${W.length} words learned · ${streak()} day streak`}
+function streak(){let n=0,d=new Date();if(!S.days[today()])d.setDate(d.getDate()-1);while(S.days[d.toISOString().slice(0,10)]){n++;d.setDate(d.getDate()-1)}return n}
+/* ---------- card ---------- */
+function card(w,full=true){const f=S.favs.includes(w.id);const ex=w.x&&w.x!="—";return `<div class="card"><p class="pt">${esc(w.p)}</p><dl><dt>Means:</dt><dd class="en">${esc(w.e)}</dd>${full?`<dt>Say it like:</dt><dd>${esc(w.s)}</dd>${ex?`<dt>Example:</dt><dd><b>${esc(w.x)}</b><br>${esc(w.xe)}</dd>`:`<dt>Tip:</dt><dd>${esc(w.xe)}</dd>`}`:""}</dl>${full?`<details><summary>Show more</summary><p>Word by word: ${esc(w.l)}</p><label class="stack">My note:<textarea data-note="${esc(w.id)}" rows="2" placeholder="Write a reminder…">${esc(S.notes[w.id]||"")}</textarea></label></details>`:""}<div class="row"><button data-say="${esc(w.p)}">🔊 Hear</button>${full&&ex?`<button data-say="${esc(w.x)}">🔊 Example</button>`:""}<button data-fav="${esc(w.id)}">${f?"★ Saved":"☆ Save"}</button></div></div>`}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-fav]");if(!b)return;const id=b.dataset.fav,i=S.favs.indexOf(id);i<0?S.favs.push(id):S.favs.splice(i,1);save();b.textContent=i<0?"★ Saved":"☆ Save"});
+document.addEventListener("input",e=>{const id=e.target.dataset&&e.target.dataset.note;if(id==null)return;const v=e.target.value.trim();v?S.notes[id]=v:delete S.notes[id];save()});
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 function daily(){const d=new Date().toDateString();let h=0;for(const ch of d)h=(h*31+ch.charCodeAt(0))>>>0;const a=[...W.keys()],o=[];while(o.length<5){h=(h*1103515245+12345)>>>0;o.push(W[a.splice(h%a.length,1)[0]])}return o}
+function stepper(list,title,done){let i=0;const show=()=>{app.innerHTML=`<div class="card note">${title} · <b>${i+1} of ${list.length}</b></div>${card(list[i])}<div class="row"><button ${i?"":"disabled"} id="pv">← Back</button><button class="pri" id="nx">${i<list.length-1?"Next →":"Finish"}</button></div>`;$("#pv").onclick=()=>{i--;show()};$("#nx").onclick=()=>{const w=list[i];S.box[w.id]=Math.max(S.box[w.id]||0,1);mark();save();prog();if(i<list.length-1){i++;show()}else done()}};show()}
+const UNITS=Object.keys(DATA);
+/* ---------- practice modes ---------- */
+function pool(n,from=W){return shuffle(from).sort((a,b)=>(S.box[a.id]||0)-(S.box[b.id]||0)).slice(0,n)}
+function finish(t,again){app.innerHTML=`<div class="card ok"><p class="pt">${t}</p><div class="row"><button class="pri" id="ag">Again</button><button onclick="go('practice')">Practice menu</button></div></div>`;$("#ag").onclick=again}
+function miss(w){S.miss[w.id]=(S.miss[w.id]||0)+1}
+function hit(w){S.box[w.id]=(S.box[w.id]||0)+1;if(S.miss[w.id]&&--S.miss[w.id]<=0)delete S.miss[w.id];mark()}
+const P={
+flash(from){const L=pool(10,from);let i=0,flip=false;const show=()=>{if(i>=L.length)return finish("Set done 🌊",()=>P.flash(from));const w=L[i];
+app.innerHTML=`<div class="card note">Card ${i+1} of ${L.length}. Guess, then tap Show.</div>${flip?card(w):`<div class="card"><p class="pt">${esc(w.p)}</p><div class="row"><button data-say="${esc(w.p)}">🔊 Hear</button><button class="pri" id="fl">Show</button></div></div>`}${flip?`<div class="row"><button id="no">Still learning</button><button class="pri" id="ye">I know it ✓</button></div>`:""}`;
+if(!flip)$("#fl").onclick=()=>{flip=true;show()};else{$("#no").onclick=()=>{S.box[w.id]=1;miss(w);nx()};$("#ye").onclick=()=>{hit(w);nx()}}};const nx=()=>{save();prog();i++;flip=false;show()};show()},
+quiz(from){const L=pool(5,from);let n=0,score=0;const ask=()=>{if(n>=L.length)return finish(`${score} of ${L.length} right`,()=>P.quiz(from));const w=L[n],opts=shuffle([w,...shuffle(W.filter(o=>o.e!=w.e)).slice(0,3)]);
+app.innerHTML=`<div class="card note">Question ${n+1} of ${L.length}. No timer.</div><div class="card"><p>What does this mean?</p><p class="pt">${esc(w.p)}</p><button data-say="${esc(w.p)}">🔊 Hear</button>${opts.map((o,k)=>`<button class="choice" data-k="${k}">${esc(o.e)}</button>`).join("")}<div id="fb"></div></div>`;
+app.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{const ok=opts[b.dataset.k]==w;app.querySelectorAll(".choice").forEach((c,k)=>{c.disabled=true;if(opts[k]==w)c.classList.add("right")});ok?(score++,hit(w)):(b.classList.add("picked"),miss(w));save();prog();
+$("#fb").innerHTML=`<div class="msg ${ok?"ok":""}">${ok?"Yes! 👍":`It means: <b>${esc(w.e)}</b>`}</div><div class="row"><button class="pri" id="nq">Next →</button></div>`;$("#nq").onclick=()=>{n++;ask()}})};ask()},
+listen(from){const L=pool(8,from);let i=0;const show=()=>{if(i>=L.length)return finish("Nice listening 🎧",()=>P.listen(from));const w=L[i];
+app.innerHTML=`<div class="card note">Listen & repeat · ${i+1} of ${L.length}</div><div class="card"><ol class="steps"><li>Tap Hear.</li><li>Say it out loud.</li><li>Tap Next when ready.</li></ol><p class="pt">${esc(w.p)}</p><p>Means: ${esc(w.e)}</p><p><small>Say it like: ${esc(w.s)}</small></p><div class="row"><button class="pri" data-say="${esc(w.p)}">🔊 Hear</button><button id="nx">Next →</button></div></div>`;$("#nx").onclick=()=>{hit(w);save();prog();i++;show()}};show()},
+match(from){const L=pool(5,from);let pick=null,left=L.length;const R=shuffle(L);
+app.innerHTML=`<div class="card note">Match the Patois to the meaning. Tap one on the left, then one on the right.</div><div class="match"><div>${L.map(w=>`<button class="m" data-side="l" data-id="${esc(w.id)}">${esc(w.p)}</button>`).join("")}</div><div>${R.map(w=>`<button class="m" data-side="r" data-id="${esc(w.id)}">${esc(w.e)}</button>`).join("")}</div></div><div id="fb"></div>`;
+app.querySelectorAll(".m").forEach(b=>b.onclick=()=>{if(b.disabled)return;if(b.dataset.side=="l"){app.querySelectorAll('[data-side=l]').forEach(x=>x.classList.remove("sel"));b.classList.add("sel");pick=b;say(byId[b.dataset.id].p);return}if(!pick)return toast("Tap a Patois word first.");
+if(pick.dataset.id==b.dataset.id){[pick,b].forEach(x=>{x.disabled=true;x.classList.add("right");x.classList.remove("sel")});hit(byId[b.dataset.id]);pick=null;if(--left==0){save();prog();setTimeout(()=>finish("All matched 🌊",()=>P.match(from)),600)}}else{$("#fb").innerHTML=`<div class="msg">Not that one. Try another.</div>`;miss(byId[pick.dataset.id])}})},
+blank(from){const L=pool(6,(from||W).filter(w=>w.x&&w.x!="—"&&w.x.toLowerCase().includes(w.p.toLowerCase().replace(/[?!.]/g,""))&&w.p.split(" ").length<=3));let n=0;const ask=()=>{if(n>=L.length)return finish("Done 🌊",()=>P.blank(from));const w=L[n],k=w.p.replace(/[?!.]/g,""),i=w.x.toLowerCase().indexOf(k.toLowerCase()),sent=esc(w.x.slice(0,i))+"<b>_____</b>"+esc(w.x.slice(i+k.length));const opts=shuffle([w,...shuffle(W.filter(o=>o.p!=w.p&&o.c==w.c)).slice(0,2)]);
+app.innerHTML=`<div class="card note">Fill the blank · ${n+1} of ${L.length}</div><div class="card"><p class="pt small">${sent}</p><p>${esc(w.xe)}</p>${opts.map((o,j)=>`<button class="choice" data-j="${j}">${esc(o.p.replace(/[?!.]/g,""))}</button>`).join("")}<div id="fb"></div></div>`;
+app.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{const ok=opts[b.dataset.j]==w;app.querySelectorAll(".choice").forEach((c,j)=>{c.disabled=true;if(opts[j]==w)c.classList.add("right")});ok?hit(w):(b.classList.add("picked"),miss(w));save();prog();say(w.x);$("#fb").innerHTML=`<div class="row"><button class="pri" id="nq">Next →</button></div>`;$("#nq").onclick=()=>{n++;ask()}})};if(!L.length)return finish("No fill-in words here yet.",()=>P.blank());ask()},
+mistakes(){const L=Object.keys(S.miss).map(id=>byId[id]).filter(Boolean);if(!L.length){app.innerHTML=`<div class="card ok">No mistakes to review. 🌊</div>`;return}P.flash(L)}};
+/* ---------- study session ---------- */
+let SESSION=null;
+function plan(min){const out=[];let left=min;while(left>0){const l=Math.min(25,left);out.push({t:"learn",m:l});left-=l;if(left>0){out.push({t:"break",m:5});left-=5}}return out}
+const ACTS=[["lesson","Lesson"],["flash","Flashcards"],["listen","Listen & repeat"],["match","Matching"],["quiz","Quiz"],["blank","Fill the blank"]];
+function sessionView(){if(!SESSION){app.innerHTML=`<div class="card"><p class="pt small">Study session</p><p>Pick how long. I'll make a calm plan with breaks. You can pause any time.</p><div class="row">${[15,30,60,120,180].map(m=>`<button class="pri" data-min="${m}">${m<60?m+" min":m/60+" hr"}</button>`).join("")}</div></div>`;app.querySelectorAll("[data-min]").forEach(b=>b.onclick=()=>{const p=plan(+b.dataset.min);SESSION={p,i:0,left:p[0].m*60,run:true,unit:UNITS.find(u=>!S.done[u])||UNITS[0]};tick();sessionView()});return}
+const s=SESSION,b=s.p[s.i],mm=Math.floor(s.left/60),ss=String(s.left%60).padStart(2,"0");
+app.innerHTML=`<div class="card note"><b>Part ${s.i+1} of ${s.p.length}</b>: ${b.t=="learn"?"Learn":"Break"} · ${mm}:${ss} left ${s.run?"":"(paused)"}<div class="bar"><span style="width:${100-s.left/(b.m*60)*100}%"></span></div><div class="row"><button id="pp">${s.run?"Pause":"Resume"}</button><button id="sk">Next part →</button><button id="st">End session</button></div></div>`+
+(b.t=="break"?`<div class="card"><p class="pt small">Break time 🌊</p><p>Stand up. Drink water. Look far away. Breathe slowly.</p></div>`:`<div class="card"><p>Pick an activity. Suggested unit: <b>${esc(s.unit)}</b></p><div class="row">${ACTS.map(([k,n])=>`<button data-act="${k}">${n}</button>`).join("")}</div></div>`);
+$("#pp").onclick=()=>{s.run=!s.run;sessionView()};$("#sk").onclick=nextPart;$("#st").onclick=()=>{SESSION=null;sessionView()};
+app.querySelectorAll("[data-act]").forEach(x=>x.onclick=()=>{const k=x.dataset.act,L=W.filter(w=>w.c==s.unit);if(k=="lesson")stepper(L,s.unit,()=>{S.done[s.unit]=1;save();s.unit=UNITS.find(u=>!S.done[u])||UNITS[0];sessionView()});else P[k](L)})}
+function nextPart(){const s=SESSION;if(!s)return;if(s.i>=s.p.length-1){SESSION=null;toast("Session done. Great work! 🌊");if(cur=="study")sessionView();return}s.i++;s.left=s.p[s.i].m*60;toast(s.p[s.i].t=="break"?"Break time. Rest a little.":"Break over. Back to learning.");if(cur=="study")sessionView()}
+function tick(){clearInterval(tick._i);tick._i=setInterval(()=>{const s=SESSION;if(!s){clearInterval(tick._i);return}if(s.run){s.left--;if(s.left<=0)nextPart()}const pill=$("#sess");if(pill){pill.hidden=!SESSION;if(SESSION)pill.textContent=`⏱ ${SESSION.p[SESSION.i].t=="learn"?"Learn":"Break"} ${Math.floor(SESSION.left/60)}:${String(SESSION.left%60).padStart(2,"0")}${SESSION.run?"":" (paused)"}`}if(cur=="study"&&s.run&&!app.querySelector(".pt:not(.small)")&&app.querySelector("#pp"))sessionView()},1000)}
+/* ---------- views ---------- */
+let cur="today";
 const V={
-today(){const d=daily();let i=0;const show=()=>{app.innerHTML=`${i==0?`<div class="card note"><b>How to use this site</b><ol><li>Learn 5 words here each day.</li><li>Tap 🔊 to hear a word.</li><li>Practice with Flashcards and Quiz.</li></ol></div>`:""}<div class="card note">Word <b>${i+1} of 5</b></div>${card(d[i])}<div class="row"><button ${i?"":"disabled"} id="pv">← Back</button><button class="pri" id="nx">${i<4?"Next →":"Finish"}</button></div>`;$("#pv").onclick=()=>{i--;show()};$("#nx").onclick=()=>{S.box[d[i].id]=Math.max(S.box[d[i].id]||0,1);save();prog();if(i<4){i++;show()}else app.innerHTML=`<div class="card ok"><p class="pt">Nice work 🌊</p><p>You looked at all 5 words today. Come back tomorrow for 5 new ones, or practice with Flashcards.</p></div>`}};show()},
-learn(){let cat="All",q="";const draw=()=>{const l=W.filter(w=>(cat=="All"||w.c==cat)&&(!q||(w.p+" "+w.e).toLowerCase().includes(q)));$("#list").innerHTML=l.map(w=>card(w)).join("")||`<div class="card">No words found. Try a different spelling.</div>`};
-app.innerHTML=`<input type="search" id="q" placeholder="Search Patois or English…" aria-label="Search"><div class="tabs" id="tabs">${["All",...Object.keys(DATA)].map(c=>`<button class="${c=="All"?"on":""}">${c}</button>`).join("")}</div><div id="list"></div>`;
-$("#q").oninput=e=>{q=e.target.value.toLowerCase().trim();draw()};$("#tabs").onclick=e=>{if(e.target.tagName!="BUTTON")return;cat=e.target.textContent;[...$("#tabs").children].forEach(b=>b.classList.toggle("on",b==e.target));draw()};draw()},
-cards(){const pool=[...W].sort((a,b)=>(S.box[a.id]||0)-(S.box[b.id]||0)||Math.random()-.5).slice(0,10);let i=0,flip=false;const show=()=>{if(i>=pool.length){app.innerHTML=`<div class="card ok"><p class="pt">Set done 🌊</p><p>Words you marked "still learning" come back first next time.</p><button class="pri" onclick="V.cards()">Another set</button></div>`;return}const w=pool[i];
-app.innerHTML=`<div class="card note">Card ${i+1} of ${pool.length}. Guess the meaning, then tap Show.</div>${flip?card(w):`<div class="card"><p class="pt">${esc(w.p)}</p><div class="row"><button onclick="say(${esc(JSON.stringify(w.p))})">🔊 Hear</button><button class="pri" id="fl">Show meaning</button></div></div>`}${flip?`<div class="row"><button id="no">Still learning</button><button class="pri" id="ye">I know it ✓</button></div>`:""}`;
-if(!flip)$("#fl").onclick=()=>{flip=true;show()};else{$("#no").onclick=()=>{S.box[w.id]=1;next()};$("#ye").onclick=()=>{S.box[w.id]=(S.box[w.id]||0)+1;next()}}};const next=()=>{save();prog();i++;flip=false;show()};show()},
-quiz(){let n=0,score=0;const ask=()=>{if(n>=5){app.innerHTML=`<div class="card ok"><p class="pt">${score} of 5 right</p><p>${score>=4?"Great job!":"Good practice. Every try helps you remember."}</p><button class="pri" onclick="V.quiz()">Try 5 more</button></div>`;return}
-const w=W[Math.floor(Math.random()*W.length)],opts=[w];while(opts.length<4){const o=W[Math.floor(Math.random()*W.length)];if(!opts.some(x=>x.e==o.e))opts.push(o)}opts.sort(()=>Math.random()-.5);
-app.innerHTML=`<div class="card note">Question ${n+1} of 5. No timer.</div><div class="card"><p>What does this mean?</p><p class="pt">${esc(w.p)}</p>${opts.map((o,k)=>`<button class="choice" data-k="${k}">${esc(o.e)}</button>`).join("")}<div id="fb"></div></div>`;
-app.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{const o=opts[b.dataset.k];app.querySelectorAll(".choice").forEach((c,k)=>{c.disabled=true;if(opts[k]==w)c.classList.add("right")});if(o==w){score++;S.box[w.id]=(S.box[w.id]||0)+1}else b.classList.add("picked");save();prog();
-$("#fb").innerHTML=`<div class="msg ${o==w?"ok":""}">${o==w?"Yes, that's right.":`Not quite. <b>${esc(w.p)}</b> means <b>${esc(w.e)}</b>.`}<br><small>Word by word: ${esc(w.l)}</small></div><div class="row"><button class="pri" id="nq">Next →</button></div>`;$("#nq").onclick=()=>{n++;ask()}})};ask()},
-favs(){const l=W.filter(w=>S.favs.includes(w.id));app.innerHTML=l.length?l.map(w=>card(w)).join(""):`<div class="card">No favorites yet. Tap ☆ Save on any word to keep it here.</div>`},
-settings(){const t=(k,label)=>`<label><input type="checkbox" data-k="${k}" ${S[k]?"checked":""}> ${label}</label>`;
-app.innerHTML=`<div class="card">${t("big","Bigger text")}${t("dys","Dyslexia-friendly font")}${t("still","Reduce motion (also skips the intro)")}${t("voice","Allow read-aloud buttons")}<p><small>Voice comes from your phone, so the accent may not sound Jamaican. On iPhone, turn off silent mode.</small></p><button id="rs">Reset my progress</button></div>`;
-app.querySelectorAll("input").forEach(i=>i.onchange=()=>{S[i.dataset.k]=i.checked;save();applyPrefs();if(i.dataset.k=="dys")loadDys()});$("#rs").onclick=()=>{if(confirm("Reset all progress? Favorites stay.")){S.box={};save();prog()}}}};
-$("#nav").onclick=e=>{const v=e.target.dataset.v;if(!v)return;window.speechSynthesis&&speechSynthesis.cancel();[...$("#nav").children].forEach(b=>b.classList.toggle("on",b==e.target));V[v]();window.scrollTo(0,0)};
-function loadDys(){if(S.dys&&!$("#dysf")){const l=document.createElement("link");l.id="dysf";l.rel="stylesheet";l.href="https://fonts.cdnfonts.com/css/opendyslexic";document.head.appendChild(l)}}
-function intro(){const skip=S.still||matchMedia("(prefers-reduced-motion: reduce)").matches;if(skip)return;
-const c=document.createElement("canvas");c.id="intro";document.body.appendChild(c);const x=c.getContext("2d");let w,h;const rs=()=>{w=c.width=innerWidth;h=c.height=innerHeight};rs();
-const st=Array.from({length:140},()=>({a:Math.random()*6.283,r:Math.max(innerWidth,innerHeight)*(.3+Math.random()*.6),z:1+Math.random()*2,v:2+Math.random()*4}));
-const t0=performance.now(),D=2000;c.onclick=()=>T=D;let T=0;
+today(){const d=daily();app.innerHTML=`<div class="card note"><b>How to use this site</b><ol><li>Do Today's 5 words.</li><li>Tap 🔊 to hear and say it out loud.</li><li>Then try Lessons, Practice or a Study session.</li></ol><div class="row"><button class="pri" id="st5">Start today's 5 →</button></div></div>`;$("#st5").onclick=()=>stepper(d,"Today",()=>{app.innerHTML=`<div class="card ok"><p class="pt">Nice work 🌊</p><p>Come back tomorrow for 5 new words.</p></div>`})},
+lessons(){app.innerHTML=`<div class="card note">Lessons. Go in order, or pick any.</div>`+UNITS.map((u,i)=>{const L=W.filter(w=>w.c==u),k=L.filter(w=>S.box[w.id]).length;return `<button class="unit" data-u="${esc(u)}"><span>${i+1}. ${esc(u)} ${S.done[u]?"✓":""}</span><small>${k}/${L.length} seen</small></button>`}).join("");
+app.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{const u=b.dataset.u,L=W.filter(w=>w.c==u);stepper(L,u,()=>{S.done[u]=1;save();app.innerHTML=`<div class="card ok"><p class="pt">${esc(u)} done ✓</p><p>Quick check?</p><div class="row"><button class="pri" id="q">Quiz this unit</button><button onclick="go('lessons')">All lessons</button></div></div>`;$("#q").onclick=()=>P.quiz(L)})})},
+practice(){const n=Object.keys(S.miss).length;app.innerHTML=`<div class="card note">Pick one. No timers.</div>`+[["flash","🃏 Flashcards"],["quiz","❓ Quiz"],["listen","🎧 Listen & repeat"],["match","🔗 Matching"],["blank","✏️ Fill the blank"],["mistakes",`🔁 Review mistakes (${n})`]].map(([k,t])=>`<button class="unit" data-p="${k}"><span>${t}</span></button>`).join("");app.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>P[b.dataset.p]())},
+study(){sessionView()},
+words(){let cat="All",q="";const draw=()=>{const l=W.filter(w=>(cat=="All"||w.c==cat)&&(!q||(w.p+" "+w.e).toLowerCase().includes(q)));$("#list").innerHTML=l.slice(0,60).map(w=>card(w)).join("")||`<div class="card">No words found.</div>`};
+app.innerHTML=`<input type="search" id="q" placeholder="Search…" aria-label="Search"><div class="tabs" id="tabs">${["All","★ Saved",...UNITS].map(c=>`<button class="${c=="All"?"on":""}">${c}</button>`).join("")}</div><div id="list"></div>`;
+$("#q").oninput=e=>{q=e.target.value.toLowerCase().trim();draw()};$("#tabs").onclick=e=>{if(e.target.tagName!="BUTTON")return;cat=e.target.textContent;[...$("#tabs").children].forEach(b=>b.classList.toggle("on",b==e.target));if(cat=="★ Saved"){$("#list").innerHTML=W.filter(w=>S.favs.includes(w.id)).map(w=>card(w)).join("")||`<div class="card">Nothing saved yet. Tap ☆ Save on a word.</div>`;return}draw()};draw()},
+me(){const t=(k,label)=>`<label><input type="checkbox" data-k="${k}" ${S[k]?"checked":""}> ${label}</label>`;
+const cal=[...Array(28)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-27+i);const k=d.toISOString().slice(0,10);return `<span class="day ${S.days[k]?"on":""}" title="${k}"></span>`}).join("");
+const notes=Object.keys(S.notes).filter(id=>byId[id]);
+app.innerHTML=`<div class="card"><p class="pt small">My progress</p><p>${streak()} day streak. Missing a day is okay.</p><div class="cal">${cal}</div><small>Last 4 weeks. Blue = you practiced.</small></div>
+<div class="card" id="acct"><p class="pt small">Account (optional)</p><div id="acctbody">Loading…</div></div>
+<div class="card"><p class="pt small">My notes</p>${notes.length?notes.map(id=>`<p><b>${esc(byId[id].p)}</b>: ${esc(S.notes[id])}</p>`).join(""):"<p>No notes yet. Open “Show more” on a word to add one.</p>"}</div>
+<div class="card"><p class="pt small">Cheat sheet</p><p>A printable list of all words.</p><button id="pr">🖨 Print cheat sheet</button></div>
+<div class="card"><p class="pt small">Settings</p>${t("voice","Sound on")}${t("big","Bigger text")}${t("dys","Dyslexia-friendly font")}${t("dark","Calm dark mode")}${t("still","Reduce motion (skips intro)")}<button id="rs">Reset my progress</button></div>`;
+app.querySelectorAll("[data-k]").forEach(i=>i.onchange=()=>{S[i.dataset.k]=i.checked;save();applyPrefs()});
+$("#rs").onclick=()=>{if(confirm("Reset progress? Saved words and notes stay.")){Object.assign(S,{box:{},miss:{},days:{},done:{}});save();prog();V.me()}};
+$("#pr").onclick=()=>{const w=open("","_blank");w.document.write(`<title>${SITE_NAME} cheat sheet</title><style>body{font:14px system-ui;margin:20px}h2{margin:16px 0 4px}td{padding:3px 8px;border-bottom:1px solid #ddd;vertical-align:top}</style><h1>${SITE_NAME} — cheat sheet</h1>`+UNITS.map(u=>`<h2>${esc(u)}</h2><table>${W.filter(x=>x.c==u).map(x=>`<tr><td><b>${esc(x.p)}</b></td><td>${esc(x.e)}</td><td>${esc(x.s)}</td></tr>`).join("")}</table>`).join(""));w.document.close();w.focus();w.print()};
+window.renderAccount&&renderAccount()}};
+function go(v){cur=v;window.speechSynthesis&&speechSynthesis.cancel();player.pause();[...$("#nav").children].forEach(b=>b.classList.toggle("on",b.dataset.v==v));V[v]();window.scrollTo(0,0)}
+$("#nav").onclick=e=>{const v=e.target.dataset.v;if(v)go(v)};
+$("#sess").onclick=()=>go("study");
+/* ---------- optional Google sign-in via Supabase ---------- */
+let sb=null,user=null;
+function renderAccount(){const el=$("#acctbody");if(!el)return;if(!sb){el.innerHTML=`<p>Sign-in isn't set up yet. Everything still saves on this device.</p>`;return}
+el.innerHTML=user?`<p>Signed in as ${esc(user.email)}. Progress syncs.</p><button id="so">Sign out</button>`:`<p>Sign in to keep progress on all your devices. Not needed.</p><button class="pri" id="si">Sign in with Google</button>`;
+const si=$("#si"),so=$("#so");if(si)si.onclick=()=>sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.origin}});if(so)so.onclick=async()=>{await sb.auth.signOut();user=null;renderAccount()}}
+window.cloudSave=async()=>{if(!sb||!user)return;const{prefs,...data}=S;await sb.from("progress").upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()})};
+async function cloudLoad(){const{data}=await sb.from("progress").select("data").eq("user_id",user.id).maybeSingle();if(data&&data.data&&(data.data.updated||0)>(S.updated||0)){Object.assign(S,data.data);localStorage.setItem("patois",JSON.stringify(S));applyPrefs();prog();toast("Progress synced.")}else cloudSave()}
+if(typeof SUPABASE_URL!="undefined"&&SUPABASE_URL&&SUPABASE_ANON_KEY){const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";sc.onload=async()=>{sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);const{data}=await sb.auth.getSession();user=data.session&&data.session.user;sb.auth.onAuthStateChange((_,s)=>{user=s&&s.user;renderAccount();if(user)cloudLoad()});if(user)cloudLoad();renderAccount()};document.head.appendChild(sc)}
+/* ---------- intro ---------- */
+function intro(){if(S.still||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+const c=document.createElement("canvas");c.id="intro";document.body.appendChild(c);const x=c.getContext("2d");const w=c.width=innerWidth,h=c.height=innerHeight;
+const st=Array.from({length:140},()=>({a:Math.random()*6.283,r:Math.max(w,h)*(.3+Math.random()*.6),z:1+Math.random()*2,v:2+Math.random()*4}));
+const t0=performance.now(),D=2000;let T=0;c.onclick=()=>T=D;
 (function f(now){T=Math.max(T,now-t0);const p=Math.min(T/D,1);x.clearRect(0,0,w,h);const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,"#5aa9dc");g.addColorStop(1,"#e6f4fb");x.fillStyle=g;x.globalAlpha=p<.8?1:1-(p-.8)/.2;x.fillRect(0,0,w,h);x.fillStyle="#fff";
-for(const s of st){let r,a;if(p<.55){const q=p/.55;r=s.r*(1-q*q);a=s.a+q*q*s.v*3}else{const q=(p-.55)/.45;r=q*Math.max(w,h)*s.z*.8;a=s.a+s.v*3}const px=w/2+Math.cos(a)*r,py=h/2+Math.sin(a)*r;x.beginPath();x.arc(px,py,s.z*(p<.55?1:1+(p-.55)*4),0,6.283);x.fill()}
+for(const s of st){let r,a;if(p<.55){const q=p/.55;r=s.r*(1-q*q);a=s.a+q*q*s.v*3}else{const q=(p-.55)/.45;r=q*Math.max(w,h)*s.z*.8;a=s.a+s.v*3}x.beginPath();x.arc(w/2+Math.cos(a)*r,h/2+Math.sin(a)*r,s.z*(p<.55?1:1+(p-.55)*4),0,6.283);x.fill()}
 x.globalAlpha=1;if(p<1)requestAnimationFrame(f);else c.remove()})(t0)}
-loadDys();applyPrefs();prog();V.today();intro();
+applyPrefs();prog();go("today");intro();
