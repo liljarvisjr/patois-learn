@@ -1,4 +1,4 @@
-const SITE_NAME="Patois Calm"; // <- change the site name here
+const SITE_NAME="Patwa Wave"; // <- change the site name here
 document.title=SITE_NAME+" — Learn Jamaican Patois";document.querySelector("h1").textContent=SITE_NAME;
 const W=[];for(const c in DATA)for(const e of DATA[c])W.push({c,p:e[0],e:e[1],l:e[2],x:e[3],xe:e[4],s:e[5],id:c+"|"+e[0]});
 const S=Object.assign({box:{},favs:[],big:false,dys:false,still:false,voice:true},JSON.parse(localStorage.getItem("patois")||"{}"));
