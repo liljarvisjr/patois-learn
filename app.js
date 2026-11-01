@@ -3,7 +3,7 @@ const AUDIO_BASE="https://cdn.jsdelivr.net/gh/liljarvisjr/patois-learn@4c8b917/a
 document.title=SITE_NAME+" — Learn Jamaican Patois";document.querySelector("h1").textContent=SITE_NAME;
 const W=[];for(const c in DATA)for(const e of DATA[c])W.push({c,p:e[0],e:e[1],l:e[2],x:e[3],xe:e[4],s:e[5],id:c+"|"+e[0]});
 const byId=Object.fromEntries(W.map(w=>[w.id,w]));
-const DEF={box:{},favs:[],notes:{},miss:{},days:{},done:{},big:false,dys:false,still:false,dark:false,voice:true,updated:0};
+const DEF={box:{},favs:[],notes:{},miss:{},days:{},done:{},big:false,dys:false,still:false,light:false,voice:true,updated:0};
 const S=Object.assign({},DEF,JSON.parse(localStorage.getItem("patois")||"{}"));
 const $=q=>document.querySelector(q),app=$("#app");
 const esc=t=>String(t).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
@@ -19,7 +19,7 @@ const h=AUDIO[t];if(!h){speak(t);return}
 try{player.pause();player.src=AUDIO_BASE+h+".mp3";const p=player.play();if(p&&p.catch)p.catch(()=>speak(t))}catch(e){speak(t)}}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(b)say(b.dataset.say)});
 /* ---------- prefs ---------- */
-function applyPrefs(){const c=document.body.classList;c.toggle("big",S.big);c.toggle("dys",S.dys);c.toggle("still",S.still);c.toggle("dark",S.dark);if(S.dys&&!$("#dysf")){const l=document.createElement("link");l.id="dysf";l.rel="stylesheet";l.href="https://fonts.cdnfonts.com/css/opendyslexic";document.head.appendChild(l)}}
+function applyPrefs(){const c=document.body.classList;c.toggle("big",S.big);c.toggle("dys",S.dys);c.toggle("still",S.still);c.toggle("light",S.light);document.querySelector("meta[name=theme-color]").content=S.light?"#fbf3f4":"#0b0507";if(S.dys&&!$("#dysf")){const l=document.createElement("link");l.id="dysf";l.rel="stylesheet";l.href="https://fonts.cdnfonts.com/css/opendyslexic";document.head.appendChild(l)}}
 function prog(){const k=W.filter(w=>(S.box[w.id]||0)>=3).length;$("#bar").style.width=(k/W.length*100)+"%";$("#progtext").textContent=`${k} of ${W.length} words learned · ${streak()} day streak`}
 function streak(){let n=0,d=new Date();if(!S.days[today()])d.setDate(d.getDate()-1);while(S.days[d.toISOString().slice(0,10)]){n++;d.setDate(d.getDate()-1)}return n}
 /* ---------- card ---------- */
@@ -79,17 +79,17 @@ $("#q").oninput=e=>{q=e.target.value.toLowerCase().trim();draw()};$("#tabs").onc
 me(){const t=(k,label)=>`<label><input type="checkbox" data-k="${k}" ${S[k]?"checked":""}> ${label}</label>`;
 const cal=[...Array(28)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-27+i);const k=d.toISOString().slice(0,10);return `<span class="day ${S.days[k]?"on":""}" title="${k}"></span>`}).join("");
 const notes=Object.keys(S.notes).filter(id=>byId[id]);
-app.innerHTML=`<div class="card"><p class="pt small">My progress</p><p>${streak()} day streak. Missing a day is okay.</p><div class="cal">${cal}</div><small>Last 4 weeks. Blue = you practiced.</small></div>
+app.innerHTML=`<div class="card"><p class="pt small">My progress</p><p>${streak()} day streak. Missing a day is okay.</p><div class="cal">${cal}</div><small>Last 4 weeks. Red = you practiced.</small></div>
 <div class="card" id="acct"><p class="pt small">Account (optional)</p><div id="acctbody">Loading…</div></div>
 <div class="card"><p class="pt small">My notes</p>${notes.length?notes.map(id=>`<p><b>${esc(byId[id].p)}</b>: ${esc(S.notes[id])}</p>`).join(""):"<p>No notes yet. Open “Show more” on a word to add one.</p>"}</div>
 <div class="card"><p class="pt small">Cheat sheet</p><p>A printable list of all words.</p><button id="pr">🖨 Print cheat sheet</button></div>
-<div class="card"><p class="pt small">Settings</p>${t("voice","Sound on")}${t("big","Bigger text")}${t("dys","Dyslexia-friendly font")}${t("dark","Calm dark mode")}${t("still","Reduce motion (skips intro)")}<button id="rs">Reset my progress</button></div>`;
+<div class="card"><p class="pt small">Settings</p>${t("voice","Sound on")}${t("big","Bigger text")}${t("dys","Dyslexia-friendly font")}${t("light","Calm light mode (softer, no red glow)")}${t("still","Reduce motion (skips intro)")}<button id="rs">Reset my progress</button></div>`;
 app.querySelectorAll("[data-k]").forEach(i=>i.onchange=()=>{S[i.dataset.k]=i.checked;save();applyPrefs()});
 $("#rs").onclick=()=>{if(confirm("Reset progress? Saved words and notes stay.")){Object.assign(S,{box:{},miss:{},days:{},done:{}});save();prog();V.me()}};
 $("#pr").onclick=()=>{const w=open("","_blank");w.document.write(`<title>${SITE_NAME} cheat sheet</title><style>body{font:14px system-ui;margin:20px}h2{margin:16px 0 4px}td{padding:3px 8px;border-bottom:1px solid #ddd;vertical-align:top}</style><h1>${SITE_NAME} — cheat sheet</h1>`+UNITS.map(u=>`<h2>${esc(u)}</h2><table>${W.filter(x=>x.c==u).map(x=>`<tr><td><b>${esc(x.p)}</b></td><td>${esc(x.e)}</td><td>${esc(x.s)}</td></tr>`).join("")}</table>`).join(""));w.document.close();w.focus();w.print()};
 window.renderAccount&&renderAccount()}};
-function go(v){cur=v;window.speechSynthesis&&speechSynthesis.cancel();player.pause();[...$("#nav").children].forEach(b=>b.classList.toggle("on",b.dataset.v==v));V[v]();window.scrollTo(0,0)}
-$("#nav").onclick=e=>{const v=e.target.dataset.v;if(v)go(v)};
+function go(v){cur=v;window.speechSynthesis&&speechSynthesis.cancel();player.pause();[...$("#nav").children].forEach(b=>b.classList.toggle("on",b.dataset.v==v));V[v]();app.classList.remove("enter");void app.offsetWidth;app.classList.add("enter");$("#ptitle").textContent={today:"Today",lessons:"Lessons",practice:"Practice",study:"Study session",words:"All words",me:"Me & settings"}[v];window.scrollTo(0,0)}
+$("#nav").onclick=e=>{const b=e.target.closest("[data-v]");if(b)go(b.dataset.v)};
 $("#sess").onclick=()=>go("study");
 /* ---------- optional Google sign-in via Supabase ---------- */
 let sb=null,user=null;
@@ -104,7 +104,8 @@ function intro(){if(S.still||matchMedia("(prefers-reduced-motion: reduce)").matc
 const c=document.createElement("canvas");c.id="intro";document.body.appendChild(c);const x=c.getContext("2d");const w=c.width=innerWidth,h=c.height=innerHeight;
 const st=Array.from({length:140},()=>({a:Math.random()*6.283,r:Math.max(w,h)*(.3+Math.random()*.6),z:1+Math.random()*2,v:2+Math.random()*4}));
 const t0=performance.now(),D=2000;let T=0;c.onclick=()=>T=D;
-(function f(now){T=Math.max(T,now-t0);const p=Math.min(T/D,1);x.clearRect(0,0,w,h);const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,"#5aa9dc");g.addColorStop(1,"#e6f4fb");x.fillStyle=g;x.globalAlpha=p<.8?1:1-(p-.8)/.2;x.fillRect(0,0,w,h);x.fillStyle="#fff";
-for(const s of st){let r,a;if(p<.55){const q=p/.55;r=s.r*(1-q*q);a=s.a+q*q*s.v*3}else{const q=(p-.55)/.45;r=q*Math.max(w,h)*s.z*.8;a=s.a+s.v*3}x.beginPath();x.arc(w/2+Math.cos(a)*r,h/2+Math.sin(a)*r,s.z*(p<.55?1:1+(p-.55)*4),0,6.283);x.fill()}
+(function f(now){T=Math.max(T,now-t0);const p=Math.min(T/D,1);x.clearRect(0,0,w,h);const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,"#5a0d18");g.addColorStop(.5,"#2a060c");g.addColorStop(1,"#0b0507");x.fillStyle=g;x.globalAlpha=p<.8?1:1-(p-.8)/.2;x.fillRect(0,0,w,h);for(const s of st){x.fillStyle=s.z>2.2?"#8fd3ff":"#fff";let r,a;if(p<.55){const q=p/.55;r=s.r*(1-q*q);a=s.a+q*q*s.v*3}else{const q=(p-.55)/.45;r=q*Math.max(w,h)*s.z*.8;a=s.a+s.v*3}x.beginPath();x.arc(w/2+Math.cos(a)*r,h/2+Math.sin(a)*r,s.z*(p<.55?1:1+(p-.55)*4),0,6.283);x.fill()}
 x.globalAlpha=1;if(p<1)requestAnimationFrame(f);else c.remove()})(t0)}
 applyPrefs();prog();go("today");intro();
+
+if("serviceWorker"in navigator&&location.protocol=="https:")navigator.serviceWorker.register("/sw.js").catch(()=>{});
