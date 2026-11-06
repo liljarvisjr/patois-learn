@@ -66,3 +66,54 @@ const ask=()=>{if(i>=c.s.length){S.chats=(S.chats||0)+1;mark();save();checkBadge
 $("#ch").onclick=()=>{const opts=c.s[i]&&c.s[i][2];if(!opts)return;hints++;$("#chips").innerHTML=(hints==1?`<small>Try something like: “${esc(opts[0].split(" ")[0])} …”</small>`:"")+(hints>1?opts.map(o=>`<button class="chip">${esc(o)}</button>`).join(""):"");$("#chips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{$("#ci").value=b.textContent;$("#cf").requestSubmit()})};
 $("#cf").onsubmit=e=>{e.preventDefault();const v=$("#ci").value.trim();if(!v)return;$("#ci").value="";add("me",esc(v));const opts=c.s[i][2],n=norm(v);let best=opts[0],bd=99;for(const o of opts){const d=lev(n,norm(o));if(d<bd){bd=d;best=o}}
 if(bd==0)add("bot","Yes! 👍");else if(bd<=Math.max(2,norm(best).length/4))add("bot",`Close! We say: <b>${esc(best)}</b> 🙂`);else add("bot",`Good try. One way to say it: <b>${esc(best)}</b>. <small>(Other ways: ${opts.filter(o=>o!=best).map(esc).join(", ")})</small>`);i++;setTimeout(ask,700)};ask()}
+
+/* ---------- English → Jamaican Creole translation guide (offline, dictionary + phrases) ---------- */
+function tNorm(s){return String(s).toLowerCase().replace(/[’']/g,"'").replace(/[^a-z0-9'\s]/g," ").replace(/\s+/g," ").trim()}
+function buildTr(){if(buildTr._)return buildTr._;
+const phrases=[],words=new Map();
+const addP=(en,patois,src)=>{const k=tNorm(en);if(!k||k.length<2)return;phrases.push({k,en:en.trim(),p:patois.trim(),src,n:k.split(" ").length})};
+const addW=(en,patois)=>{const parts=tNorm(en).split(" / ");for(const part of parts){const k=part.trim();if(!k||k.includes(" ")||k.length<2)continue;if(!words.has(k)||patois.length<words.get(k).p.length)words.set(k,{p:patois,en:k})}};
+const syn=[["hello","hi"],["hi there","hi"],["hey","hey!"],["goodbye","bye / take care"],["good bye","bye / take care"],["thanks","thanks"],["thank you","thanks"],["thank you very much","thanks"],["i'm fine","i'm okay"],["i am fine","i'm okay"],["i am ok","i'm okay"],["i am okay","i'm okay"],["im okay","i'm okay"],["im good","i'm good"],["i am good","i'm good"],["whats up","hi / what's up?"],["what's up","hi / what's up?"],["how are you doing","how are you?"],["see you","see you later"],["bye","later / bye"],["yes","yes"],["no","no"],["i do not know","i don't know"],["i do not understand","i don't understand"],["say again","say it again"],["repeat that","say it again"],["slow down","speak slowly"],["i am hungry","i'm hungry"],["i am tired","i'm tired"],["i am happy","i'm happy"],["i am sorry","i'm sorry"],["i am learning patois","i'm learning patois"],["i am coming","i'm coming"],["im coming","i'm coming"],["lets go","let's go"],["let us go","let's go"],["i want to go home","i want to go home"],["how much is this","how much is this?"],["good night","at night"],["i am at home","i'm at home"],["im at home","i'm at home"],["i have no money","i have no money"],["wait for me","wait for me"],["be careful","be careful / slow down"],["calm down","calm down"],["i love jamaica","i love jamaica"]];
+const extra=[["where are you going","Weh yuh a go?"],["where you going","Weh yuh a go?"],["where are you","Weh yuh deh?"],["i am going home","Mi a go a yaad"],["im going home","Mi a go a yaad"],["i am going to work","Mi a go a work"],["i am going to school","Mi a go a skool"],["what is your name","Wah yu name?"],["whats your name","Wah yu name?"],["what's your name","Wah yu name?"],["nice to meet you","Wah gwaan"],["good afternoon","Good evening"],["how much","How much?"],["i understand","Mi understand"],["i do not want","Mi nuh want"],["i dont want","Mi nuh want"],["i don't want","Mi nuh want"]];
+for(const w of W){
+  addP(w.e,w.p,"word");
+  if(w.e.includes(" — ")){const [enA,enB]=w.e.split(" — ");const [pA,pB]=w.p.split(" — ");if(enA&&pA)addP(enA,pA,"dialog");if(enB&&pB)addP(enB,pB,"dialog")}
+  if(w.x&&w.x!="—"&&w.xe&&w.xe!="—"&&tNorm(w.xe).split(" ").length<=12)addP(w.xe,w.x,"example");
+  addW(w.e,w.p)
+}
+for(const[a,b]of syn){const hit=W.find(w=>tNorm(w.e)==tNorm(b)||tNorm(w.e).split(" / ").includes(tNorm(b)));if(hit)addP(a,hit.p,"syn")}
+for(const[a,b]of extra)addP(a,b,"extra")
+phrases.sort((a,b)=>b.n-a.n||b.k.length-a.k.length);
+const tiny={i:"mi",me:"mi",my:"mi",you:"yuh",your:"yuh",he:"him",she:"shi",we:"wi",they:"dem",the:"di",a:"a",an:"a",to:"go",and:"an",is:"a",are:"a",am:"a",not:"nuh",dont:"nuh","don't":"nuh",no:"nuh",yes:"yes",this:"dis",that:"dat",what:"wah",where:"weh",who:"a who",when:"wen",why:"meh",how:"ow",for:"fi",of:"a",in:"inna",on:"pon",with:"wid",it:"it",ok:"alright",okay:"alright",please:"",hello:"wah gwaan",hi:"wah gwaan",bye:"lata",thanks:"tanks",thank:"tanks"};
+return buildTr._={phrases,words,tiny}}
+function translateEn(text){const {phrases,words,tiny}=buildTr();const raw=String(text||"").trim();if(!raw)return{out:"",parts:[],miss:[],hits:0};
+let s=" "+tNorm(raw)+" ",used=[],miss=[];
+for(const ph of phrases){const needle=" "+ph.k+" ";if(!s.includes(needle))continue;const tok="«"+used.length+"»";s=s.split(needle).join(" "+tok+" ");used.push({type:"phrase",en:ph.en,p:ph.p,src:ph.src})}
+const out=[],missSet=new Set();
+for(const tok of s.trim().split(/\s+/).filter(Boolean)){if(/^«\d+»$/.test(tok)){out.push(used[+tok.slice(1,-1)]);continue}
+if(words.has(tok)){out.push({type:"word",en:tok,p:words.get(tok).p});continue}
+if(tiny[tok]!=null){if(tiny[tok]==="")continue;out.push({type:"tiny",en:tok,p:tiny[tok]});continue}
+out.push({type:"miss",en:tok,p:tok});missSet.add(tok)}
+const joined=out.map(x=>x.p).join(" ").replace(/\s+/g," ").trim().replace(/^./,c=>c.toUpperCase());
+return{out:joined,parts:out,miss:[...missSet],hits:out.filter(x=>x.type!="miss").length}}
+function hearIfPossible(patois){const t=patois.trim();if(!t)return;if(typeof AUDIO!="undefined"&&AUDIO[t]){say(t);return}const soft=Object.keys(AUDIO||{}).find(k=>tNorm(k)==tNorm(t));if(soft){say(soft);return}toast("No saved sound for that whole line yet. You can still copy it.")}
+function trView(){app.innerHTML=`<div class="card note keep"><p class="pt small">Translation guide</p><p>Type English. This app looks up words and phrases from the lessons. It is a <b>helper</b>, not a full translator. Short, simple sentences work best.</p></div>
+<div class="card"><label class="stack">English<textarea id="trin" rows="4" placeholder="Example: How are you? I am hungry."></textarea></label>
+<div class="row"><button class="pri" id="trgo">Translate →</button><button id="trclr">Clear</button></div></div>
+<div class="card" id="troutbox" hidden><p class="softlab">Jamaican Creole (guide)</p><p class="pt" id="trout" lang="jam"></p>
+<p class="noteish" id="trnote"></p>
+<div class="row"><button class="pri" id="trcopy">📋 Copy</button><button data-slow id="trslow" hidden>🐢 Slow</button><button data-say id="trhear" hidden>🔊 Hear</button><button data-rep id="trrep" hidden>🔁 Repeat</button><button onclick="trView()">New</button></div>
+<details><summary>Show matches</summary><div id="trparts"></div></details></div>`;
+const run=()=>{const r=translateEn($("#trin").value);const box=$("#troutbox");if(!r.out){box.hidden=true;toast("Type some English first.");return}box.hidden=false;$("#trout").textContent=r.out;
+const known=r.parts.filter(p=>p.type!="miss").length,tot=r.parts.length;
+let note=tot?`Matched ${known} of ${tot} bits from the lesson list.`:"Nothing matched yet.";
+if(r.miss.length)note+=` Left in English: ${r.miss.map(m=>`“${m}”`).join(", ")}. Try a shorter sentence or check Words.`;
+else note+=" All parts found.";
+$("#trnote").textContent=note;
+$("#trparts").innerHTML=r.parts.map(p=>`<div class="trline"><span class="pill ${p.type}">${esc(p.type)}</span> <b>${esc(p.en)}</b> → ${esc(p.p)}</div>`).join("")||"<p>No parts.</p>";
+const can=typeof AUDIO!="undefined"&&(AUDIO[r.out]||Object.keys(AUDIO).some(k=>tNorm(k)==tNorm(r.out)));
+["trhear","trslow","trrep"].forEach(id=>{$("#"+id).hidden=!can;if(can){const b=$("#"+id);if(id=="trhear")b.dataset.say=r.out;if(id=="trslow")b.dataset.slow=r.out}});
+say.last=can?r.out:say.last;mark();checkBadges();save()};
+$("#trgo").onclick=run;$("#trin").addEventListener("keydown",e=>{if(e.key=="Enter"&&(e.metaKey||e.ctrlKey)){e.preventDefault();run()}});
+$("#trclr").onclick=()=>{$("#trin").value="";$("#troutbox").hidden=true};
+$("#trcopy").onclick=async()=>{try{await navigator.clipboard.writeText($("#trout").textContent);toast("Copied.")}catch(e){toast("Copy didn't work. Select the text and copy.")}}}

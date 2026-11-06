@@ -63,3 +63,11 @@ body.focus header .prog,body.focus footer,body.focus .card.note:not(.keep),body.
 body.focus .card{padding:28px}body.focus .pt{font-size:1.9em}
 body.focus .nav2{position:sticky;bottom:calc(var(--sab) + 80px);background:var(--card);padding:10px;border-radius:18px;border:1px solid var(--line)}
 @media print{.badges .badge{opacity:1}}
+
+/* v7 translation guide */
+.softlab{font-size:.72em;text-transform:uppercase;letter-spacing:.07em;color:var(--accent2);margin:0 0 6px}
+.noteish{color:var(--soft);font-size:.9em;margin:10px 0 0}
+.trline{margin:6px 0;padding:8px 10px;border:1px solid var(--line);border-radius:12px;font-size:.92em}
+.pill{display:inline-block;font-size:.7em;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:999px;border:1px solid var(--line);margin-right:4px}
+.pill.phrase{background:#3ccf8e22;border-color:var(--good)}.pill.word{background:#8fd3ff22;border-color:#8fd3ff66}.pill.tiny{background:#ffffff10}.pill.miss{background:#ffb84d22;border-color:#e0a84a}
+#trin{width:100%;font:inherit;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--btn);color:var(--ink);resize:vertical;min-height:96px}
