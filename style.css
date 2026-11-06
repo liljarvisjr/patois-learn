@@ -59,9 +59,15 @@ select{font:inherit;font-size:.9em;padding:8px 10px;border-radius:12px;border:1p
 .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:8px 0}.badge{display:flex;flex-direction:column;align-items:center;text-align:center;font-size:1.8em;padding:8px;border:1px solid var(--line);border-radius:14px;opacity:.35;filter:grayscale(1)}.badge.on{opacity:1;filter:none}.badge small{font-size:.4em}
 .chat{display:flex;flex-direction:column;gap:8px;margin:10px 0}.bub{max-width:85%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:var(--card)}.bub.me{align-self:flex-end;border-color:#8fd3ff66}.bub button{padding:2px 8px;font-size:.8em}
 #ci{flex:1;font:inherit;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--btn);color:var(--ink);min-width:0}
-body.focus header .prog,body.focus footer,body.focus .card.note:not(.keep),body.focus details,body.focus .card.goal{display:none}
-body.focus .card{padding:28px}body.focus .pt{font-size:1.9em}
+/* Focus: quieter chrome, NEVER blank the main area or nav */
+body.focus header .prog,body.focus footer,body.focus details,body.focus .card.goal{display:none}
+body.focus nav{display:flex!important} /* bottom/side nav always stays */
+body.focus .card{padding:24px}body.focus .pt{font-size:1.7em}
+body.focus .card.note{display:block} /* how-to / menus stay visible */
 body.focus .nav2{position:sticky;bottom:calc(var(--sab) + 80px);background:var(--card);padding:10px;border-radius:18px;border:1px solid var(--line)}
+#focusExit{position:fixed;z-index:90;left:50%;transform:translateX(-50%);top:calc(var(--sat) + 8px);display:none;align-items:center;gap:8px;background:linear-gradient(135deg,#e0344a,#a0172b);color:#fff;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:700;box-shadow:0 8px 24px #e0344a66}
+body.focus #focusExit{display:inline-flex}
+body.focus{padding-top:calc(var(--sat) + 56px)}
 @media print{.badges .badge{opacity:1}}
 
 /* v7 translation guide */
