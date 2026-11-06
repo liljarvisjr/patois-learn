@@ -74,3 +74,7 @@ body.focus .nav2{position:sticky;bottom:calc(var(--sab) + 80px);background:var(-
 
 label.inline{display:inline-flex;gap:8px;align-items:center;margin:0}
 #trstatus{min-height:1.2em}
+
+a.btnlike{display:inline-block;font:inherit;font-size:.9em;border:1px solid var(--line);background:var(--btn);color:var(--ink);padding:11px 16px;border-radius:14px;text-decoration:none}
+a.btnlike.pri,a.pri.btnlike{background:linear-gradient(135deg,#e0344a,#a0172b);color:#fff;border-color:transparent;box-shadow:0 0 14px #e0344a55}
+code{background:#ffffff14;padding:1px 6px;border-radius:6px}

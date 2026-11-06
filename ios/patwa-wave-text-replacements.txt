@@ -1,0 +1,344 @@
+Patwa Wave — iPhone / Mac text replacements (Jamaican Patois)
+This is NOT a third-party keyboard app. It uses Apple Text Replacement.
+Type a shortcut like /hello and iPhone expands it to Wah gwaan in any app.
+No extra permissions. No network. Works with your normal Apple keyboard.
+
+Official Mac import: System Settings → Keyboard → Text Replacements → drag this .plist in.
+Then iCloud syncs to your iPhone (same Apple Account + iCloud Drive).
+Apple docs: https://support.apple.com/guide/mac-help/mchl2a7bd795/mac
+iPhone text replacement help: https://support.apple.com/guide/iphone/iph6d01d862/ios
+
+Total shortcuts: 332
+
+/hello	Wah gwaan
+/hi	Wah gwaan
+/hey	Yow
+/how	Wah yuh a seh?
+/howru	Wah yuh a seh?
+/morning	Mawnin
+/evening	Gud evenin
+/bye	Lata
+/later	Likkle more
+/goodbye	Walk good
+/thanks	Tanks
+/thanku	Tanks
+/np	No problem
+/ok	Aright
+/alright	Aright
+/yes	Yeah man
+/no	Nuh
+/please	Please
+/welcome	Yuh welcome
+/respect	Respect
+/safe	Walk good
+/good	Mi good
+/imok	Mi deh yah
+/okay	Mi alright
+/happy	Mi happy
+/tired	Mi tired
+/hungry	Mi hungry
+/sick	Mi feel sick
+/sorry	Mi sorry
+/loveit	Mi love it
+/dontlike	Mi nuh like it
+/stress	Mi stress
+/calm	Mi calm
+/proud	Mi proud a yuh
+/worry	Nuh worry
+/dontworry	Nuh worry yuhself
+/excited	Mi excited
+/fedup	Mi fed up
+/lonely	Mi lonely
+/laugh	Mi a laugh
+/idk	Mi nuh know
+/idc	Mi nuh care
+/ikr	Mi know
+/understand	Mi understand
+/dontget	Mi nuh understand
+/sayagain	Seh it again
+/slow	Talk slow
+/wait	Hole on
+/holdon	Hole on
+/come	Mi a come
+/coming	Mi a come
+/letsgo	Mek wi go
+/gohome	Mi a go a yaad
+/imhome	Mi deh a yaad
+/nothome	Mi nuh deh a yaad
+/lost	Mi lost
+/help	Help mi
+/careful	Tek time
+/calmdown	Cool dung
+/really	Fi real?
+/true	True true
+/lie	Dat a lie
+/believe	Mi cyan believe it
+/noway	No sah!
+/cool	Irie
+/irie	Irie
+/bigup	Big up
+/bless	Bless up
+/soon	Mi a come soon
+/rightnow	Right now
+/tomorrow	Tomorrow
+/today	Today
+/yesterday	Yessidee
+/everyday	Every day
+/quick	Quick quick
+/longtime	Long time
+/what	Wah dat?
+/where	Weh yuh deh?
+/wherego	Weh yuh a go?
+/who	A who dat?
+/when	Wen?
+/why	Wah mek?
+/howmuch	How much?
+/name	Wah yu name?
+/from	Weh yuh come from?
+/time	Wah time it is?
+/yuhok	Yuh alright?
+/uok	Yuh good?
+/want	Yuh want some?
+/know	Yuh know?
+/mom	Muma
+/dad	Pupa
+/grandma	Granny
+/brother	Bredda
+/sister	Sista
+/friend	Pardna
+/friends	Mi fren dem
+/child	Pickney
+/kids	Pickney dem
+/boy	Bwoy
+/girl	Gyul
+/cousin	Cousin
+/teacher	Teacher
+/boss	Boss
+/home	Yaad
+/jamaica	Yaad
+/town	Town
+/country	Country
+/school	Skool
+/work	Wok
+/store	Shop
+/shop	Shop
+/left	Tun lef
+/right	Tun right
+/straight	Go straight
+/here	Right yah
+/there	Ova deh
+/far	Far
+/near	Near
+/up	Up deh
+/down	Dung deh
+/sleep	Mi a go sleep
+/shower	Mi a bathe
+/cook	Mi a cook
+/eat	Nyam
+/food	Food nice
+/water	Wata
+/money	Money
+/broke	Mi nuh have nuh money
+/rain	Rain a fall
+/hot	It hot
+/cold	It cold
+/late	Mi late
+/early	Early
+/bus	Route taxi
+/taxi	Taxi
+/dog	Dawg
+/cat	Puss
+/i	Mi
+/you	Yuh
+/he	Him
+/she	Shi
+/we	Wi
+/they	Dem
+/am	A
+/going	A go
+/will	A go
+/did	Did
+/dont	Nuh
+/not	Nuh
+/cant	Cyan
+/must	Haffi
+/wantto	Want
+/give	Gimme
+/take	Tek
+/comehere	Come yah
+/goaway	Gweh
+/look	Look pan
+/listen	Listen
+/run	Run
+/sit	Sidung
+/stand	Tan up
+/bring	Bring
+/find	Find
+/learn	Larn
+/remember	Member
+/finish	Done
+/start	Start
+/stop	Stop
+/ask	Ask fi
+/tell	Tell
+/call	Call
+/meet	Bump inna
+/reggae	Reggae
+/dancehall	Dancehall
+/music	Music
+/party	Bashment
+/strong	Hard
+/small	Likkle
+/plenty	Nuff
+/little	Likkle
+/ghost	Duppy
+/police	Babylon
+/rasta	Rasta
+/peace	One love
+/onelove	One love
+/jah	Jah
+/ital	Ital
+/anansi	Anansi
+/gwaan	Gwaan
+/wagwaan	Wah gwaan
+/yuhhear	Yuh hear
+/seh	Seh
+/fi	Fi
+/inna	Inna
+/pon	Pon
+/wid	Wid
+/dem	Dem
+/unno	Unnu
+/mi	Mi
+/yuh	Yuh
+/di	Di
+/a	A
+/nuh	Nuh
+/gwine	Gwine
+/deh	Deh
+/yah	Yah
+/likkle	Likkle
+/nuff	Nuff
+/bredren	Bredren
+/sistren	Sistren
+/pickney	Pickney
+/yaad	Yaad
+/irie2	Everyting irie
+/allgood	Everyting criss
+/criss	Criss
+/badmind	Bad mind
+/hustle	Hustle
+/payday	Payday
+/exam	Exam
+/pass	Mi pass
+/book	Book
+/lesson	Extra class
+/learning	Mi a larn Patwa
+/loveja	Mi love Jamaica
+/seeulater	Likkle more
+/gethomesafe	Reach home safe
+/whatsup	Wah gwaan
+/imhere	Mi deh yah
+/imcoming	Mi a come
+/imgoing	Mi a go
+/notgoing	Mi nah go
+/lemme	Mek mi see
+/contact	Link mi
+/link	Link mi
+/practice	Practice
+/study	Study
+/break	Tek a break
+/drink	Drink
+/full	Mi full
+/tasty	It sweet
+/sweet	It sweet
+/pepper	Pepper
+/patty	Patty
+/rice	Rice an peas
+/jerk	Jerk chicken
+/soup	Manish water
+/bread	Hardo bread
+/mango	Mango
+/coconut	Jelly
+/weather	Weather
+/sun	Sun a shine
+/moon	Moon
+/sea	Sea
+/river	River
+/plant	Bush
+/goat	Goat
+/chicken	Fowl
+/cow	Cow
+/pig	Pig
+/rat	Rat
+/lizard	Lizard
+/mosquito	Mosquito
+/firefly	Peeny wally
+/clothes	Clothes
+/shoes	Shoe
+/hat	Tam
+/shirt	Shirt
+/dress	Frock
+/head	Head
+/eye	Yeye
+/hand	Han
+/foot	Fut
+/belly	Belly
+/heart	Heart
+/back	Back
+/mouth	Mouth
+/teeth	Teet
+/nose	Nose
+/hair	Hair
+/skin	Skin
+/house	House
+/kitchen	Kitchen
+/bed	Bed
+/porch	Verandah
+/gate	Gate
+/lighton	Tun on di light
+/lightoff	Tun off di light
+/powerout	Light gawn
+/nowater	Wata cut off
+/proverb1	Every mickle mek a muckle
+/proverb2	Wan wan coco full basket
+/proverb3	Han wash han
+/proverb4	Nuh trouble trouble till trouble trouble yuh
+/wahgwaan	Wah gwaan
+/wagwan	Wah gwaan
+/whagwan	Wah gwaan
+/likklemore	Likkle more
+/walkgood	Walk good
+/yeahman	Yeah man
+/nomann	Nuh
+/mihungry	Mi hungry
+/mitired	Mi tired
+/midehyah	Mi deh yah
+/migood	Mi good
+/minuhknow	Mi nuh know
+/talkslow	Talk slow
+/sehitagain	Seh it again
+/mekwigo	Mek wi go
+/bigupyuh	Big up
+/blessup	Bless up
+/oneluv	One love
+/evertingirie	Everyting irie
+/evertingcriss	Everyting criss
+/wehugo	Weh yuh a go?
+/wahyuhseh	Wah yuh a seh?
+/gimme	Gimme
+/sidung	Sidung
+/tanup	Tan up
+/cyan	Cyan
+/haffi	Haffi
+/unnu	Unnu
+/pickneydem	Pickney dem
+/ricepeas	Rice an peas
+/jerkchicken	Jerk chicken
+/reachsafe	Reach home safe
+/linkmi	Link mi
+/miapass	Mi pass
+/tektime	Tek time
+/cooldung	Cool dung
+/fireal	Fi real?
+/nosah	No sah!
