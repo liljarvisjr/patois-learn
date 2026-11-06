@@ -36,3 +36,17 @@
 ### System-wide shortcuts (needs Mac or manual)
 
 Use `Text Substitutions.plist` on a Mac (same Apple Account), or add favorites from the `.txt` list on the iPhone by hand.
+
+
+## Writing board vocabulary sources
+
+The board loads `board-vocab.json` (2000+ entries). Sources:
+
+1. **Patwa Wave lessons** (`data.js`) — curated learner entries used on the site.
+2. **Open Grammar Project — A Learner’s Glossary of Jamaican** (CC-BY): https://opengrammar.github.io/jam/glossary/  
+   Includes attested forms such as **kompyuuta** (computer), **intanet** (internet), **anlain** (online), **plie** (play), **skuul** (school), **baaskitbaal**, **futbaal**, **krikit**, etc.
+3. **Optional AI guide** — Cloudflare Workers AI endpoint already used by Patwa Wave translate (not a perfect dictionary).
+
+We do **not** invent spellings (e.g. we do not invent *geim* if it is not in the sourced glossary). If no Jamaican form is known, English is kept. Patois spelling is not fully standardized.
+
+Education word lists (Polyglot Club and similar) were checked against the Open Grammar glossary rather than copied as unverified inventions: https://polyglotclub.com/wiki/Language/Jamaican-creole-english/Vocabulary/Education

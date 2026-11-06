@@ -8,46 +8,163 @@
 <meta name="theme-color" content="#0b0507">
 <title>Patwa Wave — Writing board</title>
 <style>
-:root{--ink:#f4eef0;--soft:#c9b6bb;--card:#1a0d11e6;--line:#4a2029;--accent:#e0344a;--accent2:#8fd3ff;--btn:#24121a}
-*{box-sizing:border-box}body{margin:0;font:18px/1.5 system-ui,-apple-system,sans-serif;color:var(--ink);background:radial-gradient(120% 80% at 50% 0%,#5a0d18,#2a060c 45%,#0b0507);min-height:100dvh;padding:calc(12px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom))}
-h1{font-size:1.25rem;margin:0}p{color:var(--soft)}.note{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}
-input{width:100%;font:inherit;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--btn);color:var(--ink);margin:8px 0}
-.area{width:100%;min-height:110px;font:inherit;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--btn);color:var(--ink)}
-.row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-button,.chip{font:inherit;border:1px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 12px;border-radius:14px}
-button.pri{background:linear-gradient(135deg,#e0344a,#a0172b);color:#fff;border:0}
-.chip{text-align:left;margin:4px 4px 0 0}.chip b{display:block;color:var(--accent2);font-size:.75rem;font-weight:600}
-.sec{margin:18px 0 6px;color:var(--accent2);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#2a0e15;border:1px solid var(--accent);padding:10px 14px;border-radius:12px;display:none;z-index:9}
-a{color:var(--accent2)}
+:root{--ink:#f4eef0;--soft:#c9b6bb;--card:#1a0d11e6;--line:#4a2029;--accent:#e0344a;--accent2:#8fd3ff;--btn:#24121a;--good:#3ccf8e}
+*{box-sizing:border-box}body{margin:0;font:17px/1.45 system-ui,-apple-system,sans-serif;color:var(--ink);background:radial-gradient(120% 80% at 50% 0%,#5a0d18,#2a060c 45%,#0b0507);min-height:100dvh;padding:calc(10px + env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom))}
+h1{font-size:1.2rem;margin:0}.sub{color:var(--soft);margin:.35rem 0 0}.note{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;color:var(--soft);font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin:10px 0}
+label{display:block;font-size:.78rem;color:var(--accent2);letter-spacing:.04em;text-transform:uppercase;margin:0 0 6px}
+textarea,input,select{width:100%;font:inherit;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--btn);color:var(--ink)}
+textarea{min-height:96px;resize:vertical}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+button,.chip,a.btn{font:inherit;border:1px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 12px;border-radius:12px;text-decoration:none;cursor:pointer}
+button.pri,a.pri{background:linear-gradient(135deg,#e0344a,#a0172b);color:#fff;border:0}
+button:disabled{opacity:.5}
+.k{min-width:34px;padding:10px 0;text-align:center;font-weight:600}
+.k.wide{min-width:72px;padding:10px 12px}
+.kb{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
+.kb2{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-top:5px}
+.kb3{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:5px}
+@media(max-width:380px){.kb,.kb2,.kb3{gap:4px}.k{min-width:0;padding:9px 0;font-size:.9rem}}
+.chip{text-align:left;flex:1 1 140px}.chip b{display:block;color:var(--accent2);font-size:.72rem}
+.chip small{display:block;color:var(--soft);font-size:.75rem}
+.sec{margin:14px 0 6px;color:var(--accent2);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase}
+#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#2a0e15;border:1px solid var(--accent);padding:10px 14px;border-radius:12px;display:none;z-index:9;max-width:90vw}
+.stat{color:var(--soft);font-size:.85rem}a{color:var(--accent2)}
+.tabs{display:flex;gap:6px;overflow:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.tabs button{white-space:nowrap;font-size:.85rem;padding:8px 10px}.tabs button.on{border-color:var(--accent2);box-shadow:0 0 0 1px #8fd3ff55}
+#list{max-height:48vh;overflow:auto;-webkit-overflow-scrolling:touch}
+.aiout{font-size:1.25rem;font-weight:700;margin:8px 0}
 </style>
 </head>
 <body>
 <h1>Patwa writing board</h1>
-<p>Not a system keyboard. Tap a phrase to add it, then Copy and paste into Messages or Notes.</p>
-<div class="note"><b>Truthful note:</b> Apple does not allow a download to install custom keyboard shortcuts or a custom system keyboard on a normal iPhone. This board is the easy iPhone-only helper.</div>
-<label>Build a sentence<textarea class="area" id="out" placeholder="Tap chips below. They land here so you can copy the whole line."></textarea></label>
-<div class="row"><button class="pri" id="copy">📋 Copy text</button><button id="clr">Clear</button><button id="space">Space</button></div>
-<input id="q" type="search" placeholder="Search Patois…" aria-label="Search">
+<p class="sub">Broad vocabulary + letter keys + AI guide. Not a system keyboard. Not every word in Jamaican Creole.</p>
+<div class="note"><b>Honest label:</b> This board mixes Patwa Wave lessons, a large public Jamaican learner glossary (Open Grammar Project), and optional free AI translation. If no Jamaican form is known, English is kept. Spellings vary in real life.</div>
+
+<div class="card">
+<label>Your text</label>
+<textarea id="out" placeholder="Type with the letter keys, or tap words below, or translate English…"></textarea>
+<div class="row">
+<button class="pri" id="copy">📋 Copy</button>
+<button id="space">Space</button>
+<button id="bk">⌫</button>
+<button id="nl">New line</button>
+<button id="clr">Clear</button>
+</div>
+<p class="stat" id="count">0 characters</p>
+</div>
+
+<div class="card">
+<label>Letter & number keys</label>
+<div class="row"><button id="caps" class="k wide">ABC / abc</button><button id="nums" class="k wide">123</button></div>
+<div id="keys"></div>
+</div>
+
+<div class="card">
+<label>English → Patois (AI guide)</label>
+<textarea id="en" rows="2" placeholder="Type any English here…"></textarea>
+<div class="row"><button class="pri" id="tr">Translate with AI</button><button id="tradd">Add to text</button><button id="trcopy">Copy result</button></div>
+<p class="stat" id="trst">Uses the free Patwa Wave AI helper when online. Offline: search the glossary.</p>
+<p class="aiout" id="trout" lang="jam"></p>
+</div>
+
+<div class="card">
+<label>Search English or Patois</label>
+<input id="q" type="search" placeholder="e.g. computer, kompyuuta, school, game…" aria-label="Search">
+<label style="margin-top:10px">Category</label>
+<div class="tabs" id="cats"></div>
+<p class="stat" id="meta">Loading vocabulary…</p>
 <div id="list"></div>
-<p><a href="/">← Back to Patwa Wave</a> · <a href="/ios/README.md">Install facts</a></p>
+</div>
+
+<p><a href="/">← Patwa Wave</a> · <a href="/ios/README.md">Sources & limits</a> · <a href="/ios/Patwa-Wave-Board.mobileconfig">Home Screen icon</a></p>
 <div id="toast" role="status"></div>
 <script>
-const ALL = [{"s": "/hello", "p": "Wah gwaan"}, {"s": "/hi", "p": "Wah gwaan"}, {"s": "/hey", "p": "Yow"}, {"s": "/how", "p": "Wah yuh a seh?"}, {"s": "/howru", "p": "Wah yuh a seh?"}, {"s": "/morning", "p": "Mawnin"}, {"s": "/evening", "p": "Gud evenin"}, {"s": "/bye", "p": "Lata"}, {"s": "/later", "p": "Likkle more"}, {"s": "/goodbye", "p": "Walk good"}, {"s": "/thanks", "p": "Tanks"}, {"s": "/thanku", "p": "Tanks"}, {"s": "/np", "p": "No problem"}, {"s": "/ok", "p": "Aright"}, {"s": "/alright", "p": "Aright"}, {"s": "/yes", "p": "Yeah man"}, {"s": "/no", "p": "Nuh"}, {"s": "/please", "p": "Please"}, {"s": "/welcome", "p": "Yuh welcome"}, {"s": "/respect", "p": "Respect"}, {"s": "/safe", "p": "Walk good"}, {"s": "/good", "p": "Mi good"}, {"s": "/imok", "p": "Mi deh yah"}, {"s": "/okay", "p": "Mi alright"}, {"s": "/happy", "p": "Mi happy"}, {"s": "/tired", "p": "Mi tired"}, {"s": "/hungry", "p": "Mi hungry"}, {"s": "/sick", "p": "Mi feel sick"}, {"s": "/sorry", "p": "Mi sorry"}, {"s": "/loveit", "p": "Mi love it"}, {"s": "/dontlike", "p": "Mi nuh like it"}, {"s": "/stress", "p": "Mi stress"}, {"s": "/calm", "p": "Mi calm"}, {"s": "/proud", "p": "Mi proud a yuh"}, {"s": "/worry", "p": "Nuh worry"}, {"s": "/dontworry", "p": "Nuh worry yuhself"}, {"s": "/excited", "p": "Mi excited"}, {"s": "/fedup", "p": "Mi fed up"}, {"s": "/lonely", "p": "Mi lonely"}, {"s": "/laugh", "p": "Mi a laugh"}, {"s": "/idk", "p": "Mi nuh know"}, {"s": "/idc", "p": "Mi nuh care"}, {"s": "/ikr", "p": "Mi know"}, {"s": "/understand", "p": "Mi understand"}, {"s": "/dontget", "p": "Mi nuh understand"}, {"s": "/sayagain", "p": "Seh it again"}, {"s": "/slow", "p": "Talk slow"}, {"s": "/wait", "p": "Hole on"}, {"s": "/holdon", "p": "Hole on"}, {"s": "/come", "p": "Mi a come"}, {"s": "/coming", "p": "Mi a come"}, {"s": "/letsgo", "p": "Mek wi go"}, {"s": "/gohome", "p": "Mi a go a yaad"}, {"s": "/imhome", "p": "Mi deh a yaad"}, {"s": "/nothome", "p": "Mi nuh deh a yaad"}, {"s": "/lost", "p": "Mi lost"}, {"s": "/help", "p": "Help mi"}, {"s": "/careful", "p": "Tek time"}, {"s": "/calmdown", "p": "Cool dung"}, {"s": "/really", "p": "Fi real?"}, {"s": "/true", "p": "True true"}, {"s": "/lie", "p": "Dat a lie"}, {"s": "/believe", "p": "Mi cyan believe it"}, {"s": "/noway", "p": "No sah!"}, {"s": "/cool", "p": "Irie"}, {"s": "/irie", "p": "Irie"}, {"s": "/bigup", "p": "Big up"}, {"s": "/bless", "p": "Bless up"}, {"s": "/soon", "p": "Mi a come soon"}, {"s": "/rightnow", "p": "Right now"}, {"s": "/tomorrow", "p": "Tomorrow"}, {"s": "/today", "p": "Today"}, {"s": "/yesterday", "p": "Yessidee"}, {"s": "/everyday", "p": "Every day"}, {"s": "/quick", "p": "Quick quick"}, {"s": "/longtime", "p": "Long time"}, {"s": "/what", "p": "Wah dat?"}, {"s": "/where", "p": "Weh yuh deh?"}, {"s": "/wherego", "p": "Weh yuh a go?"}, {"s": "/who", "p": "A who dat?"}, {"s": "/when", "p": "Wen?"}, {"s": "/why", "p": "Wah mek?"}, {"s": "/howmuch", "p": "How much?"}, {"s": "/name", "p": "Wah yu name?"}, {"s": "/from", "p": "Weh yuh come from?"}, {"s": "/time", "p": "Wah time it is?"}, {"s": "/yuhok", "p": "Yuh alright?"}, {"s": "/uok", "p": "Yuh good?"}, {"s": "/want", "p": "Yuh want some?"}, {"s": "/know", "p": "Yuh know?"}, {"s": "/mom", "p": "Muma"}, {"s": "/dad", "p": "Pupa"}, {"s": "/grandma", "p": "Granny"}, {"s": "/brother", "p": "Bredda"}, {"s": "/sister", "p": "Sista"}, {"s": "/friend", "p": "Pardna"}, {"s": "/friends", "p": "Mi fren dem"}, {"s": "/child", "p": "Pickney"}, {"s": "/kids", "p": "Pickney dem"}, {"s": "/boy", "p": "Bwoy"}, {"s": "/girl", "p": "Gyul"}, {"s": "/cousin", "p": "Cousin"}, {"s": "/teacher", "p": "Teacher"}, {"s": "/boss", "p": "Boss"}, {"s": "/home", "p": "Yaad"}, {"s": "/jamaica", "p": "Yaad"}, {"s": "/town", "p": "Town"}, {"s": "/country", "p": "Country"}, {"s": "/school", "p": "Skool"}, {"s": "/work", "p": "Wok"}, {"s": "/store", "p": "Shop"}, {"s": "/shop", "p": "Shop"}, {"s": "/left", "p": "Tun lef"}, {"s": "/right", "p": "Tun right"}, {"s": "/straight", "p": "Go straight"}, {"s": "/here", "p": "Right yah"}, {"s": "/there", "p": "Ova deh"}, {"s": "/far", "p": "Far"}, {"s": "/near", "p": "Near"}, {"s": "/up", "p": "Up deh"}, {"s": "/down", "p": "Dung deh"}, {"s": "/sleep", "p": "Mi a go sleep"}, {"s": "/shower", "p": "Mi a bathe"}, {"s": "/cook", "p": "Mi a cook"}, {"s": "/eat", "p": "Nyam"}, {"s": "/food", "p": "Food nice"}, {"s": "/water", "p": "Wata"}, {"s": "/money", "p": "Money"}, {"s": "/broke", "p": "Mi nuh have nuh money"}, {"s": "/rain", "p": "Rain a fall"}, {"s": "/hot", "p": "It hot"}, {"s": "/cold", "p": "It cold"}, {"s": "/late", "p": "Mi late"}, {"s": "/early", "p": "Early"}, {"s": "/bus", "p": "Route taxi"}, {"s": "/taxi", "p": "Taxi"}, {"s": "/dog", "p": "Dawg"}, {"s": "/cat", "p": "Puss"}, {"s": "/i", "p": "Mi"}, {"s": "/you", "p": "Yuh"}, {"s": "/he", "p": "Him"}, {"s": "/she", "p": "Shi"}, {"s": "/we", "p": "Wi"}, {"s": "/they", "p": "Dem"}, {"s": "/am", "p": "A"}, {"s": "/going", "p": "A go"}, {"s": "/will", "p": "A go"}, {"s": "/did", "p": "Did"}, {"s": "/dont", "p": "Nuh"}, {"s": "/not", "p": "Nuh"}, {"s": "/cant", "p": "Cyan"}, {"s": "/must", "p": "Haffi"}, {"s": "/wantto", "p": "Want"}, {"s": "/give", "p": "Gimme"}, {"s": "/take", "p": "Tek"}, {"s": "/comehere", "p": "Come yah"}, {"s": "/goaway", "p": "Gweh"}, {"s": "/look", "p": "Look pan"}, {"s": "/listen", "p": "Listen"}, {"s": "/run", "p": "Run"}, {"s": "/sit", "p": "Sidung"}, {"s": "/stand", "p": "Tan up"}, {"s": "/bring", "p": "Bring"}, {"s": "/find", "p": "Find"}, {"s": "/learn", "p": "Larn"}, {"s": "/remember", "p": "Member"}, {"s": "/finish", "p": "Done"}, {"s": "/start", "p": "Start"}, {"s": "/stop", "p": "Stop"}, {"s": "/ask", "p": "Ask fi"}, {"s": "/tell", "p": "Tell"}, {"s": "/call", "p": "Call"}, {"s": "/meet", "p": "Bump inna"}, {"s": "/reggae", "p": "Reggae"}, {"s": "/dancehall", "p": "Dancehall"}, {"s": "/music", "p": "Music"}, {"s": "/party", "p": "Bashment"}, {"s": "/strong", "p": "Hard"}, {"s": "/small", "p": "Likkle"}, {"s": "/plenty", "p": "Nuff"}, {"s": "/little", "p": "Likkle"}, {"s": "/ghost", "p": "Duppy"}, {"s": "/police", "p": "Babylon"}, {"s": "/rasta", "p": "Rasta"}, {"s": "/peace", "p": "One love"}, {"s": "/onelove", "p": "One love"}, {"s": "/jah", "p": "Jah"}, {"s": "/ital", "p": "Ital"}, {"s": "/anansi", "p": "Anansi"}, {"s": "/gwaan", "p": "Gwaan"}, {"s": "/wagwaan", "p": "Wah gwaan"}, {"s": "/yuhhear", "p": "Yuh hear"}, {"s": "/seh", "p": "Seh"}, {"s": "/fi", "p": "Fi"}, {"s": "/inna", "p": "Inna"}, {"s": "/pon", "p": "Pon"}, {"s": "/wid", "p": "Wid"}, {"s": "/dem", "p": "Dem"}, {"s": "/unno", "p": "Unnu"}, {"s": "/mi", "p": "Mi"}, {"s": "/yuh", "p": "Yuh"}, {"s": "/di", "p": "Di"}, {"s": "/a", "p": "A"}, {"s": "/nuh", "p": "Nuh"}, {"s": "/gwine", "p": "Gwine"}, {"s": "/deh", "p": "Deh"}, {"s": "/yah", "p": "Yah"}, {"s": "/likkle", "p": "Likkle"}, {"s": "/nuff", "p": "Nuff"}, {"s": "/bredren", "p": "Bredren"}, {"s": "/sistren", "p": "Sistren"}, {"s": "/pickney", "p": "Pickney"}, {"s": "/yaad", "p": "Yaad"}, {"s": "/irie2", "p": "Everyting irie"}, {"s": "/allgood", "p": "Everyting criss"}, {"s": "/criss", "p": "Criss"}, {"s": "/badmind", "p": "Bad mind"}, {"s": "/hustle", "p": "Hustle"}, {"s": "/payday", "p": "Payday"}, {"s": "/exam", "p": "Exam"}, {"s": "/pass", "p": "Mi pass"}, {"s": "/book", "p": "Book"}, {"s": "/lesson", "p": "Extra class"}, {"s": "/learning", "p": "Mi a larn Patwa"}, {"s": "/loveja", "p": "Mi love Jamaica"}, {"s": "/seeulater", "p": "Likkle more"}, {"s": "/gethomesafe", "p": "Reach home safe"}, {"s": "/whatsup", "p": "Wah gwaan"}, {"s": "/imhere", "p": "Mi deh yah"}, {"s": "/imcoming", "p": "Mi a come"}, {"s": "/imgoing", "p": "Mi a go"}, {"s": "/notgoing", "p": "Mi nah go"}, {"s": "/lemme", "p": "Mek mi see"}, {"s": "/contact", "p": "Link mi"}, {"s": "/link", "p": "Link mi"}, {"s": "/practice", "p": "Practice"}, {"s": "/study", "p": "Study"}, {"s": "/break", "p": "Tek a break"}, {"s": "/drink", "p": "Drink"}, {"s": "/full", "p": "Mi full"}, {"s": "/tasty", "p": "It sweet"}, {"s": "/sweet", "p": "It sweet"}, {"s": "/pepper", "p": "Pepper"}, {"s": "/patty", "p": "Patty"}, {"s": "/rice", "p": "Rice an peas"}, {"s": "/jerk", "p": "Jerk chicken"}, {"s": "/soup", "p": "Manish water"}, {"s": "/bread", "p": "Hardo bread"}, {"s": "/mango", "p": "Mango"}, {"s": "/coconut", "p": "Jelly"}, {"s": "/weather", "p": "Weather"}, {"s": "/sun", "p": "Sun a shine"}, {"s": "/moon", "p": "Moon"}, {"s": "/sea", "p": "Sea"}, {"s": "/river", "p": "River"}, {"s": "/plant", "p": "Bush"}, {"s": "/goat", "p": "Goat"}, {"s": "/chicken", "p": "Fowl"}, {"s": "/cow", "p": "Cow"}, {"s": "/pig", "p": "Pig"}, {"s": "/rat", "p": "Rat"}, {"s": "/lizard", "p": "Lizard"}, {"s": "/mosquito", "p": "Mosquito"}, {"s": "/firefly", "p": "Peeny wally"}, {"s": "/clothes", "p": "Clothes"}, {"s": "/shoes", "p": "Shoe"}, {"s": "/hat", "p": "Tam"}, {"s": "/shirt", "p": "Shirt"}, {"s": "/dress", "p": "Frock"}, {"s": "/head", "p": "Head"}, {"s": "/eye", "p": "Yeye"}, {"s": "/hand", "p": "Han"}, {"s": "/foot", "p": "Fut"}, {"s": "/belly", "p": "Belly"}, {"s": "/heart", "p": "Heart"}, {"s": "/back", "p": "Back"}, {"s": "/mouth", "p": "Mouth"}, {"s": "/teeth", "p": "Teet"}, {"s": "/nose", "p": "Nose"}, {"s": "/hair", "p": "Hair"}, {"s": "/skin", "p": "Skin"}, {"s": "/house", "p": "House"}, {"s": "/kitchen", "p": "Kitchen"}, {"s": "/bed", "p": "Bed"}, {"s": "/porch", "p": "Verandah"}, {"s": "/gate", "p": "Gate"}, {"s": "/lighton", "p": "Tun on di light"}, {"s": "/lightoff", "p": "Tun off di light"}, {"s": "/powerout", "p": "Light gawn"}, {"s": "/nowater", "p": "Wata cut off"}, {"s": "/proverb1", "p": "Every mickle mek a muckle"}, {"s": "/proverb2", "p": "Wan wan coco full basket"}, {"s": "/proverb3", "p": "Han wash han"}, {"s": "/proverb4", "p": "Nuh trouble trouble till trouble trouble yuh"}, {"s": "/wahgwaan", "p": "Wah gwaan"}, {"s": "/wagwan", "p": "Wah gwaan"}, {"s": "/whagwan", "p": "Wah gwaan"}, {"s": "/likklemore", "p": "Likkle more"}, {"s": "/walkgood", "p": "Walk good"}, {"s": "/yeahman", "p": "Yeah man"}, {"s": "/nomann", "p": "Nuh"}, {"s": "/mihungry", "p": "Mi hungry"}, {"s": "/mitired", "p": "Mi tired"}, {"s": "/midehyah", "p": "Mi deh yah"}, {"s": "/migood", "p": "Mi good"}, {"s": "/minuhknow", "p": "Mi nuh know"}, {"s": "/talkslow", "p": "Talk slow"}, {"s": "/sehitagain", "p": "Seh it again"}, {"s": "/mekwigo", "p": "Mek wi go"}, {"s": "/bigupyuh", "p": "Big up"}, {"s": "/blessup", "p": "Bless up"}, {"s": "/oneluv", "p": "One love"}, {"s": "/evertingirie", "p": "Everyting irie"}, {"s": "/evertingcriss", "p": "Everyting criss"}, {"s": "/wehugo", "p": "Weh yuh a go?"}, {"s": "/wahyuhseh", "p": "Wah yuh a seh?"}, {"s": "/gimme", "p": "Gimme"}, {"s": "/sidung", "p": "Sidung"}, {"s": "/tanup", "p": "Tan up"}, {"s": "/cyan", "p": "Cyan"}, {"s": "/haffi", "p": "Haffi"}, {"s": "/unnu", "p": "Unnu"}, {"s": "/pickneydem", "p": "Pickney dem"}, {"s": "/ricepeas", "p": "Rice an peas"}, {"s": "/jerkchicken", "p": "Jerk chicken"}, {"s": "/reachsafe", "p": "Reach home safe"}, {"s": "/linkmi", "p": "Link mi"}, {"s": "/miapass", "p": "Mi pass"}, {"s": "/tektime", "p": "Tek time"}, {"s": "/cooldung", "p": "Cool dung"}, {"s": "/fireal", "p": "Fi real?"}, {"s": "/nosah", "p": "No sah!"}];
-const CATS = {"Greetings": ["/hello", "/hi", "/hey", "/how", "/howru", "/morning", "/evening", "/bye", "/later", "/goodbye", "/thanks", "/thanku", "/np", "/ok", "/alright", "/yes", "/no", "/welcome", "/respect", "/safe", "/whatsup", "/wagwaan", "/wahgwaan"], "Feelings": ["/good", "/imok", "/okay", "/happy", "/tired", "/hungry", "/sick", "/sorry", "/loveit", "/dontlike", "/stress", "/calm", "/proud", "/worry", "/dontworry", "/excited", "/fedup", "/lonely", "/laugh"], "Useful lines": ["/idk", "/ikr", "/dontget", "/understand", "/sayagain", "/slow", "/wait", "/holdon", "/come", "/coming", "/letsgo", "/gohome", "/imhome", "/help", "/careful", "/calmdown", "/really", "/true", "/cool", "/irie", "/bigup", "/bless", "/learning", "/loveja", "/seeulater", "/gethomesafe", "/link", "/notgoing", "/imcoming"], "Questions": ["/what", "/where", "/wherego", "/who", "/when", "/why", "/howmuch", "/name", "/from", "/time", "/yuhok", "/uok", "/want", "/know"], "People": ["/mom", "/dad", "/grandma", "/brother", "/sister", "/friend", "/friends", "/child", "/kids", "/boy", "/girl", "/cousin", "/teacher", "/boss"], "Everyday": ["/home", "/town", "/school", "/work", "/shop", "/sleep", "/eat", "/food", "/water", "/money", "/rain", "/hot", "/cold", "/late", "/taxi"]};
+const TR_API="https://patois-translate.newsatlas.workers.dev";
 const $=id=>document.getElementById(id);
-function toast(t){const m=$('toast');m.textContent=t;m.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(()=>m.style.display='none',1800)}
-async function copyText(t){if(!t){toast('Nothing to copy');return}try{await navigator.clipboard.writeText(t);toast('Copied');}catch(e){const a=$('out');a.focus();a.select();document.execCommand('copy');toast('Copied');}}
-function add(p){const a=$('out');const v=a.value;a.value=(v && !/\s$/.test(v)?v+' ':'')+p;a.focus()}
-function draw(){const q=$('q').value.trim().toLowerCase();const root=$('list');root.innerHTML='';
-  const used=new Set();
-  const render=(title,items)=>{const wrap=document.createElement('div');if(title){const h=document.createElement('div');h.className='sec';h.textContent=title;wrap.appendChild(h)}
-    const row=document.createElement('div');row.className='row';items.forEach(it=>{used.add(it.s);const b=document.createElement('button');b.className='chip';b.innerHTML='<b>'+it.s.replace(/</g,'&lt;')+'</b>'+it.p.replace(/</g,'&lt;');b.onclick=()=>add(it.p);row.appendChild(b)});wrap.appendChild(row);root.appendChild(wrap)};
-  if(q){render('Matches', ALL.filter(x=>x.s.includes(q)||x.p.toLowerCase().includes(q)).slice(0,80));return}
-  for(const [name,keys] of Object.entries(CATS)){const items=keys.map(k=>ALL.find(x=>x.s===k)).filter(Boolean);if(items.length)render(name,items)}
-  render('More', ALL.filter(x=>!used.has(x.s)).slice(0,120));
+let VOCAB=[], CAT="All", upper=true, mode="alpha";
+const ALPHA=[["Q","W","E","R","T","Y","U","I","O","P"],["A","S","D","F","G","H","J","K","L"],["Z","X","C","V","B","N","M"]];
+const NUMS=[["1","2","3","4","5","6","7","8","9","0"],["-","/",":",";","(",")","$","&","@","\""],[".",",","?","!","'","#"]];
+function toast(t){const m=$("toast");m.textContent=t;m.style.display="block";clearTimeout(toast._t);toast._t=setTimeout(()=>m.style.display="none",1600)}
+function setOut(v){$("out").value=v; $("count").textContent=v.length+" characters"}
+function insert(t){const a=$("out"); const s=a.selectionStart??a.value.length, e=a.selectionEnd??s; const v=a.value; setOut(v.slice(0,s)+t+v.slice(e)); const p=s+t.length; a.focus(); a.setSelectionRange(p,p)}
+function backspace(){const a=$("out"); let s=a.selectionStart??a.value.length, e=a.selectionEnd??s; let v=a.value; if(s===e&&s>0){s--;} setOut(v.slice(0,s)+v.slice(e)); a.focus(); a.setSelectionRange(s,s)}
+function drawKeys(){
+  const box=$("keys"); box.innerHTML="";
+  const rows=mode==="alpha"?ALPHA:NUMS;
+  rows.forEach((row,i)=>{
+    const g=document.createElement("div"); g.className=i===0?"kb":(i===1?"kb2":"kb3");
+    row.forEach(ch=>{
+      const b=document.createElement("button"); b.className="k";
+      const show=mode==="alpha"?(upper?ch:ch.toLowerCase()):ch;
+      b.textContent=show; b.onclick=()=>insert(show); g.appendChild(b);
+    });
+    box.appendChild(g);
+  });
 }
-$('q').oninput=draw;$('copy').onclick=()=>copyText($('out').value.trim());$('clr').onclick=()=>$('out').value='';$('space').onclick=()=>$('out').value+=' ';
-draw();
+async function copyText(t){if(!t){toast("Nothing to copy");return} try{await navigator.clipboard.writeText(t);toast("Copied")}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove();toast("Copied")}}
+function cats(){const s=new Set(VOCAB.map(v=>v.c)); return ["All",...[...s].sort((a,b)=>a.localeCompare(b))]}
+function drawCats(){
+  const el=$("cats"); el.innerHTML="";
+  cats().forEach(c=>{const b=document.createElement("button"); b.textContent=c+(c==="All"?"":` (${VOCAB.filter(v=>v.c===c).length})`); if(c===CAT)b.className="on"; b.onclick=()=>{CAT=c; drawCats(); drawList()}; el.appendChild(b)})
+}
+function drawList(){
+  const q=$("q").value.trim().toLowerCase();
+  let items=VOCAB.filter(v=>CAT==="All"||v.c===CAT);
+  if(q) items=items.filter(v=>(v.p+" "+v.e+" "+(v.e_full||"")).toLowerCase().includes(q));
+  $("meta").textContent=`Showing ${Math.min(items.length,200)} of ${items.length} · total loaded ${VOCAB.length} (broad set, not complete)`;
+  const root=$("list"); root.innerHTML="";
+  const by={};
+  items.slice(0,200).forEach(v=>{(by[v.c]=by[v.c]||[]).push(v)});
+  Object.keys(by).sort().forEach(c=>{
+    const h=document.createElement("div"); h.className="sec"; h.textContent=c; root.appendChild(h);
+    const row=document.createElement("div"); row.className="row";
+    by[c].forEach(v=>{
+      const b=document.createElement("button"); b.className="chip";
+      b.innerHTML=`<b>${esc(v.p)}</b>${esc(v.e)}<small>${esc(v.src||"")}</small>`;
+      b.onclick=()=>insert((($("out").value&&!/\s$/.test($("out").value))?" ":"")+v.p);
+      row.appendChild(b);
+    });
+    root.appendChild(row);
+  });
+  if(!items.length) root.innerHTML=`<p class="stat">No glossary hit. Try AI translate above, or keep the English word.</p>`;
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
+async function translate(){
+  const text=$("en").value.trim(); if(!text){toast("Type English first");return}
+  const btn=$("tr"); btn.disabled=true; $("trst").textContent="Working…";
+  try{
+    const res=await fetch(TR_API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({text})});
+    if(!res.ok) throw new Error("bad status");
+    const j=await res.json();
+    if(!j.patois) throw new Error("empty");
+    $("trout").textContent=j.patois;
+    $("trst").textContent="AI guide result (can make mistakes). Tap Add to text or Copy.";
+  }catch(e){
+    // offline glossary fallback: word-ish lookup
+    const words=text.toLowerCase().split(/[^a-z']+/).filter(Boolean);
+    const parts=words.map(w=>{
+      const hit=VOCAB.find(v=>v.e.toLowerCase()===w || (v.e_full||"").toLowerCase().split(/[;,]/).map(x=>x.trim()).includes(w));
+      return hit?hit.p:w; // keep English if unknown
+    });
+    $("trout").textContent=parts.join(" ");
+    $("trst").textContent="AI unavailable — used glossary where known, kept English otherwise.";
+  }finally{btn.disabled=false}
+}
+$("copy").onclick=()=>copyText($("out").value);
+$("clr").onclick=()=>setOut("");
+$("space").onclick=()=>insert(" ");
+$("nl").onclick=()=>insert("\n");
+$("bk").onclick=backspace;
+$("caps").onclick=()=>{upper=!upper; if(mode!=="alpha")mode="alpha"; drawKeys()};
+$("nums").onclick=()=>{mode=mode==="nums"?"alpha":"nums"; drawKeys()};
+$("q").oninput=drawList;
+$("tr").onclick=translate;
+$("tradd").onclick=()=>{const t=$("trout").textContent.trim(); if(t) insert((($("out").value&&!/\s$/.test($("out").value))?" ":"")+t)};
+$("trcopy").onclick=()=>copyText($("trout").textContent.trim());
+$("out").oninput=()=>$("count").textContent=$("out").value.length+" characters";
+drawKeys();
+fetch("board-vocab.json").then(r=>r.json()).then(data=>{VOCAB=data; drawCats(); drawList()}).catch(()=>{$("meta").textContent="Could not load vocabulary file."});
 </script>
-</body></html>
+</body>
+</html>
