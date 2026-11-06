@@ -97,23 +97,57 @@ out.push({type:"miss",en:tok,p:tok});missSet.add(tok)}
 const joined=out.map(x=>x.p).join(" ").replace(/\s+/g," ").trim().replace(/^./,c=>c.toUpperCase());
 return{out:joined,parts:out,miss:[...missSet],hits:out.filter(x=>x.type!="miss").length}}
 function hearIfPossible(patois){const t=patois.trim();if(!t)return;if(typeof AUDIO!="undefined"&&AUDIO[t]){say(t);return}const soft=Object.keys(AUDIO||{}).find(k=>tNorm(k)==tNorm(t));if(soft){say(soft);return}toast("No saved sound for that whole line yet. You can still copy it.")}
-function trView(){app.innerHTML=`<div class="card note keep"><p class="pt small">Translation guide</p><p>Type English. This app looks up words and phrases from the lessons. It is a <b>helper</b>, not a full translator. Short, simple sentences work best.</p></div>
-<div class="card"><label class="stack">English<textarea id="trin" rows="4" placeholder="Example: How are you? I am hungry."></textarea></label>
-<div class="row"><button class="pri" id="trgo">Translate →</button><button id="trclr">Clear</button></div></div>
-<div class="card" id="troutbox" hidden><p class="softlab">Jamaican Creole (guide)</p><p class="pt" id="trout" lang="jam"></p>
+const TR_API = "https://patois-translate.newsatlas.workers.dev";
+async function translateAI(text){
+  const ctrl = new AbortController();
+  const t = setTimeout(()=>ctrl.abort(), 20000);
+  try{
+    const res = await fetch(TR_API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({text}),signal:ctrl.signal});
+    clearTimeout(t);
+    if(!res.ok)throw new Error("bad status "+res.status);
+    const j = await res.json();
+    if(!j.patois)throw new Error(j.error||"empty");
+    return j;
+  }catch(e){clearTimeout(t);throw e}
+}
+function trView(){
+  app.innerHTML=`<div class="card note keep"><p class="pt small">Translate to Patois</p><p>Type any English. Online, a free AI helper turns it into Jamaican Patois. If you are offline, a local phrase guide is used instead.</p></div>
+<div class="card"><label class="stack">English<textarea id="trin" rows="5" placeholder="Type any English sentence…"></textarea></label>
+<div class="row"><button class="pri" id="trgo">Translate →</button><button id="trclr">Clear</button>
+<label class="inline">Mode <select id="trmode"><option value="auto">Auto (AI when online)</option><option value="ai">AI only</option><option value="local">Offline guide only</option></select></label></div>
+<p class="noteish" id="trstatus"></p></div>
+<div class="card" id="troutbox" hidden><p class="softlab" id="trlab">Jamaican Patois</p><p class="pt" id="trout" lang="jam"></p>
 <p class="noteish" id="trnote"></p>
-<div class="row"><button class="pri" id="trcopy">📋 Copy</button><button data-slow id="trslow" hidden>🐢 Slow</button><button data-say id="trhear" hidden>🔊 Hear</button><button data-rep id="trrep" hidden>🔁 Repeat</button><button onclick="trView()">New</button></div>
-<details><summary>Show matches</summary><div id="trparts"></div></details></div>`;
-const run=()=>{const r=translateEn($("#trin").value);const box=$("#troutbox");if(!r.out){box.hidden=true;toast("Type some English first.");return}box.hidden=false;$("#trout").textContent=r.out;
-const known=r.parts.filter(p=>p.type!="miss").length,tot=r.parts.length;
-let note=tot?`Matched ${known} of ${tot} bits from the lesson list.`:"Nothing matched yet.";
-if(r.miss.length)note+=` Left in English: ${r.miss.map(m=>`“${m}”`).join(", ")}. Try a shorter sentence or check Words.`;
-else note+=" All parts found.";
-$("#trnote").textContent=note;
-$("#trparts").innerHTML=r.parts.map(p=>`<div class="trline"><span class="pill ${p.type}">${esc(p.type)}</span> <b>${esc(p.en)}</b> → ${esc(p.p)}</div>`).join("")||"<p>No parts.</p>";
-const can=typeof AUDIO!="undefined"&&(AUDIO[r.out]||Object.keys(AUDIO).some(k=>tNorm(k)==tNorm(r.out)));
-["trhear","trslow","trrep"].forEach(id=>{$("#"+id).hidden=!can;if(can){const b=$("#"+id);if(id=="trhear")b.dataset.say=r.out;if(id=="trslow")b.dataset.slow=r.out}});
-say.last=can?r.out:say.last;mark();checkBadges();save()};
-$("#trgo").onclick=run;$("#trin").addEventListener("keydown",e=>{if(e.key=="Enter"&&(e.metaKey||e.ctrlKey)){e.preventDefault();run()}});
-$("#trclr").onclick=()=>{$("#trin").value="";$("#troutbox").hidden=true};
-$("#trcopy").onclick=async()=>{try{await navigator.clipboard.writeText($("#trout").textContent);toast("Copied.")}catch(e){toast("Copy didn't work. Select the text and copy.")}}}
+<div class="row"><button class="pri" id="trcopy">📋 Copy</button><button data-slow id="trslow" hidden>🐢 Slow</button><button data-say id="trhear" hidden>🔊 Hear</button><button data-rep id="trrep" hidden>🔁 Repeat</button><button id="tragain">Try again</button></div>
+<details id="trdetails" hidden><summary>Show offline matches</summary><div id="trparts"></div></details></div>`;
+  const setAudio=(out)=>{const can=typeof AUDIO!="undefined"&&(AUDIO[out]||Object.keys(AUDIO).some(k=>tNorm(k)==tNorm(out)));
+    ["trhear","trslow","trrep"].forEach(id=>{const b=$("#"+id);b.hidden=!can;if(can){if(id=="trhear")b.dataset.say=out;if(id=="trslow")b.dataset.slow=out}});if(can)say.last=out};
+  const showLocal=(r)=>{const box=$("#troutbox");box.hidden=false;$("#trlab").textContent="Jamaican Patois (offline guide)";$("#trout").textContent=r.out;
+    const known=r.parts.filter(p=>p.type!="miss").length,tot=r.parts.length;
+    let note=tot?`Offline guide matched ${known} of ${tot} bits from lessons + grammar rules.`:"Nothing matched offline.";
+    if(r.miss.length)note+=` Left in English: ${r.miss.map(m=>`“${m}”`).join(", ")}.`;
+    note+=" For fuller wording, go online and use Auto/AI mode.";
+    $("#trnote").textContent=note;$("#trdetails").hidden=false;
+    $("#trparts").innerHTML=r.parts.map(p=>`<div class="trline"><span class="pill ${p.type}">${esc(p.type)}</span> <b>${esc(p.en)}</b> → ${esc(p.p)}</div>`).join("")||"<p>No parts.</p>";
+    setAudio(r.out)};
+  const showAI=(patois,meta)=>{const box=$("#troutbox");box.hidden=false;$("#trlab").textContent="Jamaican Patois (AI)";$("#trout").textContent=patois;
+    $("#trnote").textContent=(meta||"Translated with a free AI model.")+" This can make mistakes. Offline guide is still available.";
+    $("#trdetails").hidden=true;setAudio(patois)};
+  const run=async()=>{const text=$("#trin").value.trim();if(!text){toast("Type some English first.");return}
+    const mode=$("#trmode").value;const st=$("#trstatus");const btn=$("#trgo");btn.disabled=true;st.textContent="Working…";
+    try{
+      if(mode==="local"){showLocal(translateEn(text));st.textContent="Used offline guide.";return}
+      if(!navigator.onLine && mode!=="ai"){showLocal(translateEn(text));st.textContent="Offline — used local guide.";return}
+      try{
+        const j=await translateAI(text);showAI(j.patois,`AI model: ${j.model||"llama"}.`);st.textContent="AI translation ready.";
+        mark();checkBadges();save();
+      }catch(e){
+        if(mode==="ai"){st.textContent="AI is not available right now.";toast("AI translation failed. Try again or switch to Offline guide.");$("#troutbox").hidden=true;return}
+        showLocal(translateEn(text));st.textContent="AI busy/unavailable — used offline guide.";
+      }
+    }finally{btn.disabled=false;mark();checkBadges();save()}};
+  $("#trgo").onclick=run;$("#tragain").onclick=run;
+  $("#trin").addEventListener("keydown",e=>{if(e.key=="Enter"&&(e.metaKey||e.ctrlKey)){e.preventDefault();run()}});
+  $("#trclr").onclick=()=>{$("#trin").value="";$("#troutbox").hidden=true;$("#trstatus").textContent=""};
+  $("#trcopy").onclick=async()=>{try{await navigator.clipboard.writeText($("#trout").textContent);toast("Copied.")}catch(e){toast("Copy didn't work. Select the text and copy.")}}
+}
