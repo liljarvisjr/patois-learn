@@ -111,7 +111,7 @@ async function translateAI(text){
   }catch(e){clearTimeout(t);throw e}
 }
 function trView(){
-  app.innerHTML=`<div class="card note keep"><p class="pt small">Translate to Patois</p><p>Type any English. Online, a free AI helper turns it into Jamaican Patois. If you are offline, a local phrase guide is used instead.</p><div class="row"><a class="btnlike" href="/ios/Text%20Substitutions.plist" download="Text Substitutions.plist">⬇ iPhone Patois keyboard shortcuts</a></div><small>Apple Text Replacement file (not a third-party keyboard). See Me → Settings for install steps.</small></div>
+  app.innerHTML=`<div class="card note keep"><p class="pt small">Translate to Patois</p><p>Type any English. Online, a free AI helper turns it into Jamaican Patois. If you are offline, a local phrase guide is used instead.</p><div class="row"><a class="btnlike" href="/ios/board.html">📱 Writing board (iPhone easy)</a><a class="btnlike" href="/ios/Text%20Substitutions.plist" download="Text Substitutions.plist">⬇ Mac shortcuts file</a></div><small>Writing board = tap &amp; copy. No fake system keyboard. See Me for facts.</small></div>
 <div class="card"><label class="stack">English<textarea id="trin" rows="5" placeholder="Type any English sentence…"></textarea></label>
 <div class="row"><button class="pri" id="trgo">Translate →</button><button id="trclr">Clear</button>
 <label class="inline">Mode <select id="trmode"><option value="auto">Auto (AI when online)</option><option value="ai">AI only</option><option value="local">Offline guide only</option></select></label></div>

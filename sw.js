@@ -1,5 +1,5 @@
 // Offline support: app files cached on install; audio cached as you hear it.
-const V="pw-v9",SHELL=["/","/index.html","/style.css","/app.js","/data.js","/audio.js","/config.js","/feat.js","/icon.svg","/manifest.webmanifest","/ios/Text%20Substitutions.plist","/ios/patwa-wave-text-replacements.txt","/ios/README.md"];
+const V="pw-v10",SHELL=["/","/index.html","/style.css","/app.js","/data.js","/audio.js","/config.js","/feat.js","/icon.svg","/manifest.webmanifest","/ios/board.html","/ios/README.md","/ios/patwa-wave-text-replacements.txt"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(SHELL)));self.skipWaiting()});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!=V&&x!="pw-audio").map(x=>caches.delete(x)))));self.clients.claim()});
 self.addEventListener("fetch",e=>{const r=e.request;if(r.method!="GET")return;const u=new URL(r.url);

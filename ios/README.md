@@ -1,46 +1,38 @@
-# Patwa Wave — iPhone Patois typing shortcuts
+# Patwa Wave — iPhone Patois helpers (honest)
 
-This is **not** a custom third-party keyboard.
+## Can Apple install a custom Patois keyboard from a file?
 
-It is Apple’s own **Text Replacement** list (the same feature as typing `omw` → “On my way!”).  
-You download a configuration file, import it, and then shortcuts like `/hello` become `Wah gwaan` in Messages, Notes, Safari — every app.  
-No special keyboard to install. No extra app permissions. No network from the shortcuts themselves.
+**No — not on a normal personal iPhone.**
 
-## Files
+### What Apple documents support
 
-- `Text Substitutions.plist` — Apple import file (phrase + shortcut)
-- `patwa-wave-text-replacements.txt` — same list, easy to read
+1. **Configuration profiles (`.mobileconfig`)**  
+   Official [Configuration Profile Reference](https://developer.apple.com/business/documentation/Configuration-Profile-Reference.pdf) lists payloads such as Wi‑Fi, VPN, Email, Restrictions, **Web Clip**, certificates, etc.  
+   There is **no** payload that installs Text Replacement phrases or a custom system keyboard layout with alternate characters.
 
-Shortcuts all start with `/` so normal English words are not replaced.
+2. **Keyboard management (MDM)**  
+   Apple’s [Keyboard declarative configuration](https://support.apple.com/guide/deployment/keyboard-declarative-configuration-depe51e8b3cc/web) (iOS 26.4+, **supervised**, Automated Device Enrollment) can only **allow or turn off** text replacement and similar settings. It does **not** push a phrase list. Personal unsupervised iPhones cannot use this for a “Patois keyboard pack.”
 
-## Best install path (official)
+3. **Text Replacement on iPhone**  
+   Add one-by-one in **Settings → General → Keyboard → Text Replacement** ([Apple iPhone guide](https://support.apple.com/guide/iphone/iph6d01d862/ios)), or import a `.plist` on a **Mac** and sync with iCloud ([Apple Mac guide](https://support.apple.com/guide/mac-help/mchl2a7bd795/mac)). Apple staff have stated direct iPhone plist import is not available ([Apple Community](https://discussions.apple.com/thread/254040319)).
 
-Apple does **not** provide a one-tap “open plist on iPhone → Import” for Text Replacement.  
-The supported way is:
+4. **Custom keyboards**  
+   A real alternate-character keyboard requires an App Store **Custom Keyboard** extension (separate app). A website or `.mobileconfig` cannot become the system keyboard.
 
-1. On a **Mac** signed into the **same Apple Account** as your iPhone, open  
-   **System Settings → Keyboard → Text Replacements**.
-2. Drag `Text Substitutions.plist` into that window, then click **Done**.
-3. Wait for **iCloud** to sync (iCloud Drive on, same Apple Account).
-4. On iPhone check: **Settings → General → Keyboard → Text Replacement**.
+### What we ship instead (real, useful, iPhone-friendly)
 
-Apple’s guide: [Back up and share text replacements on Mac](https://support.apple.com/guide/mac-help/mchl2a7bd795/mac)  
-iPhone feature guide: [Text replacements on iPhone](https://support.apple.com/guide/iphone/iph6d01d862/ios)
+| File | What it actually does |
+| --- | --- |
+| `board.html` | Offline-friendly **writing board**: tap Patois chips → Copy → paste anywhere. **Not** a system keyboard. |
+| `Patwa-Wave-Board.mobileconfig` | Official **Web Clip** profile: installs a **Home Screen icon** that opens the writing board. Removable. Does **not** change the keyboard. |
+| `Text Substitutions.plist` | Apple Text Replacement file for **Mac import → iCloud → iPhone**. |
+| `patwa-wave-text-replacements.txt` | Same shortcuts as a readable list for manual iPhone entry. |
 
-## iPhone-only (no Mac)
+### Easy iPhone path (no Mac)
 
-1. Download the `.txt` list and keep it in Files.
-2. Open **Settings → General → Keyboard → Text Replacement → +**.
-3. Copy a **Phrase** and its **Shortcut** from the list (start with `/`).
-4. Add the ones you use most. You do not need all of them.
+1. Open **https://patois-learn.pages.dev/ios/board.html** (Share → Add to Home Screen), **or** open **Patwa-Wave-Board.mobileconfig**, then **Settings → Profile Downloaded → Install** (adds the Home Screen icon only).
+2. Tap phrases → **Copy** → paste into Messages.
 
-## How to type
+### System-wide shortcuts (needs Mac or manual)
 
-In any app, type `/how` then space → `Wah yuh a seh?`  
-Examples: `/hello` → Wah gwaan · `/ikr` → Mi know · `/thanks` → Tanks
-
-## Remove later
-
-Settings → General → Keyboard → Text Replacement → swipe delete,  
-or Mac Text Replacements → delete rows,  
-or Reset Keyboard Dictionary (removes *all* custom shortcuts).
+Use `Text Substitutions.plist` on a Mac (same Apple Account), or add favorites from the `.txt` list on the iPhone by hand.
